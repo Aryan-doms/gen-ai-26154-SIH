@@ -2,6 +2,10 @@
 // Direct connection to FastAPI at :8000 avoids Vite dev-server proxy loopback EPERM issues in sandboxed environments
 
 function getApiBase() {
+  if (import.meta.env.VITE_API_URL) {
+    const base = import.meta.env.VITE_API_URL.replace(/\/$/, '');
+    return base.endsWith('/api') ? base : `${base}/api`;
+  }
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {

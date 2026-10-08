@@ -54,15 +54,17 @@ Source Documents (PDFs, Reports, Images, Notes)
 ├── backend/
 │   ├── app/
 │   │   ├── agents/            # 9 specialized deliverable creator modules
+│   │   ├── fixtures/          # Baseline sample transformation seed fixtures
 │   │   ├── models/            # Pydantic schemas (canonical, impact, operator, assistant)
 │   │   ├── services/          # Gemini client, in-memory store, gatekeeper, verification
 │   │   ├── workflow/          # Planner, cross-checker, validator, impact evaluator, regenerator
 │   │   ├── config.py          # Environment settings
 │   │   └── main.py            # FastAPI endpoints
-│   ├── test_api.py            # Core endpoint test suite
-│   ├── test_assistant_gatekeeper.py # Assistant domain boundary test suite
-│   ├── test_stage6_flow.py    # Editorial review workflow test suite
-│   ├── test_stage7_invariant.py # Selective update preservation test suite
+│   ├── tests/
+│   │   ├── test_api.py        # Core endpoint test suite
+│   │   ├── test_assistant.py  # Assistant domain boundary test suite
+│   │   ├── test_editorial_workflow.py # Editorial review workflow test suite
+│   │   └── test_selective_update.py   # Selective update preservation test suite
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
@@ -71,11 +73,13 @@ Source Documents (PDFs, Reports, Images, Notes)
 │   │   ├── App.jsx            # Routing and state orchestration
 │   │   └── main.jsx
 │   ├── package.json
+│   ├── vercel.json            # Vercel SPA client rewrite configuration
 │   └── vite.config.js
 ├── dummy_data/                # Sample source documents and project data
 ├── .env.example               # Configuration template
 ├── .gitignore                 # Strict repository hygiene rules
 ├── requirements.txt           # Python root dependencies
+├── vercel.json                # Root Vercel deployment configuration
 └── README.md
 ```
 
@@ -129,10 +133,10 @@ Frontend will be active at `http://localhost:3000`.
 
 ```bash
 # Run all automated backend tests from repository root
-PYTHONPATH=backend python backend/test_api.py
-PYTHONPATH=backend python backend/test_assistant_gatekeeper.py
-PYTHONPATH=backend python backend/test_stage6_flow.py
-PYTHONPATH=backend python backend/test_stage7_invariant.py
+PYTHONPATH=backend python backend/tests/test_api.py
+PYTHONPATH=backend python backend/tests/test_assistant.py
+PYTHONPATH=backend python backend/tests/test_editorial_workflow.py
+PYTHONPATH=backend python backend/tests/test_selective_update.py
 ```
 
 All test suites verify:
@@ -140,6 +144,16 @@ All test suites verify:
 - Context Assistant boundary enforcement for project queries.
 - Human review workflow (editing, diff tracking, sign-off).
 - Selective fact propagation: when a claim changes, unaffected approved deliverables remain intact while affected deliverables regenerate for review.
+
+---
+
+### 4. Vercel Deployment (Frontend)
+
+The repository includes pre-configured `vercel.json` (root) and `frontend/vercel.json` for SPA routing rewrites and automatic Vite builds.
+- **Import into Vercel**: Connect this repository to your Vercel account.
+- **Root Directory**: `frontend` (or repository root).
+- **Framework Preset**: `Vite`.
+- **Environment Variables (Optional)**: Set `VITE_API_URL` to your deployed backend URL. If omitted, the frontend operates seamlessly with interactive fallback datasets.
 
 ---
 

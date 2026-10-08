@@ -1,8 +1,11 @@
-# In-process test script to verify FastAPI endpoints
+# End-to-end integration tests for FastAPI backend endpoints
 import sys
 from pathlib import Path
-backend_dir = Path(__file__).resolve().parent
-sys.path.insert(0, str(backend_dir))
+
+# Add backend directory to path
+backend_dir = Path(__file__).resolve().parent.parent
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 from fastapi.testclient import TestClient
 from app.main import app
@@ -29,7 +32,7 @@ def test_endpoints():
     print("\n[*] Testing POST /api/work/TRF-2026-0417/edit...")
     res = client.post("/api/work/TRF-2026-0417/edit", json={
         "output_type": "social_media",
-        "updated_content": "Security Alert: All systems restored and verified."
+        "updated_content": "Project Alert: All systems restored and verified."
     })
     assert res.status_code == 200
     edit_data = res.json()
@@ -42,9 +45,9 @@ def test_endpoints():
     })
     assert res.status_code == 200
     appr_data = res.json()
-    print(f"  [✓] Social media status: Approved!")
+    print(f"  [✓] Deliverable status: Approved!")
 
-    print("\n[*] Testing POST /api/assistant/query (SLM Gatekeeper)...")
+    print("\n[*] Testing POST /api/assistant/query (Domain Boundary Guardrail)...")
     res_rejected = client.post("/api/assistant/query", json={"query": "write python code for quicksort"})
     assert res_rejected.status_code == 200
     assert res_rejected.json()["boundary_enforced"] is True

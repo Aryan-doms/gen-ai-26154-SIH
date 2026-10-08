@@ -26,18 +26,18 @@ class TransformationStore:
         self._load_demo_transformation()
 
     def _load_demo_transformation(self):
-        # helper to load the verified demo transformation from stages 1-5
-        base_dir = Path(__file__).resolve().parent.parent.parent
-        stage1_file = base_dir / "stage1_canonical_output.json"
-        stage2_file = base_dir / "stage2_transformation_plan_output.json"
-        stage4_file = base_dir / "stage4_all_creators_output.json"
+        # helper to load verified reference transformation
+        fixtures_dir = Path(__file__).resolve().parent.parent / "fixtures"
+        canonical_file = fixtures_dir / "canonical_source.json"
+        plan_file = fixtures_dir / "transformation_plan.json"
+        outputs_file = fixtures_dir / "initial_outputs.json"
 
-        if stage1_file.exists() and stage2_file.exists() and stage4_file.exists():
-            with open(stage1_file, "r", encoding="utf-8") as f:
+        if canonical_file.exists() and plan_file.exists() and outputs_file.exists():
+            with open(canonical_file, "r", encoding="utf-8") as f:
                 canonical_data = json.load(f)
-            with open(stage2_file, "r", encoding="utf-8") as f:
+            with open(plan_file, "r", encoding="utf-8") as f:
                 plan_data = json.load(f)
-            with open(stage4_file, "r", encoding="utf-8") as f:
+            with open(outputs_file, "r", encoding="utf-8") as f:
                 raw_outputs = json.load(f)
 
             canonical = CanonicalSource.model_validate(canonical_data)
