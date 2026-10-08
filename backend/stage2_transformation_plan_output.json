@@ -1,0 +1,180 @@
+{
+  "plan_id": "PLN-INC-2026-0417-01",
+  "case_id": "INC-2026-0417",
+  "global_objective": "Awareness and response",
+  "outputs_plan": [
+    {
+      "output_type": "executive_summary",
+      "title": "Executive Summary: Operation Silver Falcon Incident Response",
+      "target_audience": "Leadership, CISO, and Government cybersecurity and security operations teams",
+      "tone": "Professional, factual and concise with high-level strategic clarity",
+      "communication_objective": "Brief leadership on incident scope, operational impact, and risk posture (Awareness and response)",
+      "relevant_claim_ids": [
+        "CLM-001",
+        "CLM-002",
+        "CLM-004",
+        "CLM-005",
+        "CLM-006"
+      ],
+      "mandatory_elements": [
+        "Incident Overview and Severity classification (SEVERITY-HIGH)",
+        "Exact operational disruption window (47 minutes)",
+        "Affected systems enumeration (PORTAL-01, APP-02, AUTH-01)",
+        "Current containment status (services restored as of 03:22 UTC)",
+        "Explicit statement that attribution remains UNCONFIRMED"
+      ],
+      "prohibited_elements": [
+        "Speculative attribution to named threat groups",
+        "Deep forensic terminal syntax or low-level exploit payloads"
+      ],
+      "dependencies": [],
+      "validation_rules": [
+        "Disruption duration must equal canonical claim value (47 minutes)",
+        "Attribution must state UNCONFIRMED",
+        "Affected systems must list PORTAL-01, APP-02, and AUTH-01",
+        "Contains all required executive sections"
+      ]
+    },
+    {
+      "output_type": "security_advisory",
+      "title": "Technical Security Advisory: Session Replay & Infrastructure Hardening (SEC-ADV-2026-0417)",
+      "target_audience": "Government cybersecurity and security operations teams",
+      "tone": "Professional, factual and concise - highly structured, technical, and actionable",
+      "communication_objective": "Technical mitigation and defensive posture enhancement (Awareness and response)",
+      "relevant_claim_ids": [
+        "CLM-001",
+        "CLM-002",
+        "CLM-003",
+        "CLM-004",
+        "CLM-005",
+        "CLM-006",
+        "CLM-007"
+      ],
+      "mandatory_elements": [
+        "Advisory Title, CVE/Case ID, Severity (SEVERITY-HIGH)",
+        "Incident Summary and Initial Access Vector (admin-research session replay)",
+        "Indicators of Compromise: IPv4 185.203.117.42, tool falcon_pipe (MD5: e4d909c290d0fb1ca068ffaddf22cbd0)",
+        "Technical Impact across PORTAL-01, APP-02, AUTH-01",
+        "Actionable Recommendations (FIDO2 MFA, network segmentation, Kerberos KRBTGT rotation)",
+        "Confidence / Attribution status (strictly UNCONFIRMED)"
+      ],
+      "prohibited_elements": [
+        "Unsubstantiated threat actor attribution",
+        "Ambiguous defensive recommendations"
+      ],
+      "dependencies": [],
+      "validation_rules": [
+        "Must include all confirmed IoCs (IP, account, malware hash)",
+        "Must include concrete mitigation steps",
+        "Attribution must be explicitly unconfirmed",
+        "Disruption duration must match canonical duration"
+      ]
+    },
+    {
+      "output_type": "social_media",
+      "title": "Public Awareness & Community Incident Disclosure Post",
+      "target_audience": "General public, technology community, and platform users",
+      "tone": "Professional, factual and concise - transparent, reassuring, and concise",
+      "communication_objective": "Public transparency, reassure data integrity, and announce service restoration (Awareness and response)",
+      "relevant_claim_ids": [
+        "CLM-001",
+        "CLM-004",
+        "CLM-005",
+        "CLM-006"
+      ],
+      "mandatory_elements": [
+        "Acknowledgment of 47-minute service disruption on the Research Portal",
+        "Confirmation of rapid containment and full service restoration at 03:22 UTC",
+        "Confirmation that core database integrity was maintained",
+        "Commitment to security transparency"
+      ],
+      "prohibited_elements": [
+        "Speculative adversary attribution",
+        "Sensitive internal credentials (e.g. admin-research username)",
+        "Exaggerated or alarming claims beyond verified facts"
+      ],
+      "dependencies": [],
+      "validation_rules": [
+        "Length within platform constraints (under 280 words)",
+        "Disruption duration strictly matches canonical duration (47 minutes)",
+        "No speculative attribution",
+        "No disclosure of sensitive internal account identifiers"
+      ]
+    },
+    {
+      "output_type": "presentation",
+      "title": "Incident Briefing Deck: Operation Silver Falcon Response & Lessons Learned",
+      "target_audience": "Technical Steering Committee, CISO, and Operations Review Board",
+      "tone": "Professional, factual and concise - structured, analytical, and visually organized",
+      "communication_objective": "Structured briefing covering chronology, technical findings, and long-term remediation (Awareness and response)",
+      "relevant_claim_ids": [
+        "CLM-001",
+        "CLM-002",
+        "CLM-003",
+        "CLM-004",
+        "CLM-005",
+        "CLM-006",
+        "CLM-007"
+      ],
+      "mandatory_elements": [
+        "Slide 1: Incident Overview & Classification",
+        "Slide 2: Chronological Timeline (01:58 UTC to 03:22 UTC)",
+        "Slide 3: Affected Systems & Operational Impact (47 minutes)",
+        "Slide 4: Technical Findings & Indicators of Compromise",
+        "Slide 5: Response, Current Containment & Hardening",
+        "Evidence/Claim IDs mapped to each slide"
+      ],
+      "prohibited_elements": [
+        "Speculative adversary attribution",
+        "Unmapped factual assertions lacking claim references"
+      ],
+      "dependencies": [],
+      "validation_rules": [
+        "Must contain exactly 5 structured slides matching standard agenda",
+        "All slides must reference relevant canonical claim IDs",
+        "Disruption duration must equal 47 minutes",
+        "Attribution must state UNCONFIRMED"
+      ]
+    },
+    {
+      "output_type": "video_script",
+      "title": "Video Briefing Script: Operation Silver Falcon Quick-Response Overview",
+      "target_audience": "Security staff, internal agency personnel, and technical researchers",
+      "tone": "Professional, factual and concise - clear, engaging, authoritative, and spoken-word natural",
+      "communication_objective": "Audiovisual briefing summarizing the event, containment success, and security takeaways (Awareness and response)",
+      "relevant_claim_ids": [
+        "CLM-001",
+        "CLM-002",
+        "CLM-004",
+        "CLM-005",
+        "CLM-006"
+      ],
+      "mandatory_elements": [
+        "Structured scenes with scene number, estimated duration in seconds, visual cue, spoken narration, on-screen text",
+        "Scene covering initial detection at 02:14 UTC",
+        "Scene covering 47-minute disruption window and containment at 03:22 UTC",
+        "Scene covering hardening and current secure operating state",
+        "Explicit spoken confirmation that attribution is unconfirmed"
+      ],
+      "prohibited_elements": [
+        "Mention of unverified threat groups",
+        "Discrepancies in timeline or outage duration (e.g. stating 74 minutes instead of 47 minutes)"
+      ],
+      "dependencies": [],
+      "validation_rules": [
+        "Total runtime between 60 to 90 seconds",
+        "All scenes must include visual and narration fields",
+        "Disruption duration spoken and on-screen must be exactly 47 minutes",
+        "Attribution unconfirmed"
+      ]
+    }
+  ],
+  "cross_output_consistency_rules": [
+    "RULE-01: Disruption Duration Consistency - All outputs referencing disruption must state exactly 47 minutes (or the exact value in CLM-001).",
+    "RULE-02: Attribution Integrity - No output may claim or infer a specific threat actor or nation-state; attribution must remain UNCONFIRMED.",
+    "RULE-03: Entity Integrity - All references to systems must use canonical identifiers: PORTAL-01, APP-02, AUTH-01.",
+    "RULE-04: Timeline Consistency - Detection at 02:14 UTC, disruption from 02:35 to 03:22 UTC, full restoration at 03:22 UTC.",
+    "RULE-05: IoC Consistency - All technical outputs referencing attacker ingress must use IP 185.203.117.42."
+  ],
+  "created_at": "2026-10-07T11:35:05.656525+00:00"
+}

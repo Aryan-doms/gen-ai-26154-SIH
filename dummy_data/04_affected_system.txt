@@ -1,0 +1,21 @@
+================================================================================
+SYSTEM ARCHITECTURE & IMPACT MAP: INC-2026-0417
+================================================================================
+
+1. PORTAL-01
+- Role: Public Research Gateway
+- Operating System: Ubuntu 24.04 LTS
+- Impact: 47 minutes outage. Web listeners unresponsive between 02:35 and 03:22 UTC due to backend request queue exhaustion from APP-02.
+- Remediated: Service restarted, edge proxy caches cleared.
+
+2. APP-02
+- Role: Research Processing & Computation Node
+- Operating System: RHEL 9.3
+- Impact: Compromised via cached SSH keys from AUTH-01. Unauthorized root privileges attempted. Resource hogging script spawned.
+- Remediated: Re-imaged from golden image v4.2, isolated network segment, keys rotated.
+
+3. AUTH-01
+- Role: Identity Provider & Kerberos / SSO Directory
+- Operating System: Debian 12
+- Impact: Stolen session token for 'admin-research' replayed. No hash dump detected.
+- Remediated: Global Kerberos ticket-granting service ticket (KRBTGT) cycled, admin password enforced reset with mandatory FIDO2 hardware token.

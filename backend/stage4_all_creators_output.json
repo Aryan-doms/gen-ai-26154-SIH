@@ -1,0 +1,274 @@
+{
+  "executive_summary": {
+    "title": "Executive Summary: Operation Silver Falcon Incident Response",
+    "case_id": "INC-2026-0417",
+    "severity": "SEVERITY-HIGH",
+    "incident_overview": "On 17 April 2026 at 02:14 UTC, the Security Operations Center (SOC) detected an anomalous privileged authentication event targeting the core Research Portal infrastructure. An unauthorized session was initiated through the compromised administrative account 'admin-research' from external IP 185.203.117.42, bypassing standard MFA protocols via token replay [CLM-002]. Lateral movement was subsequently executed toward backend compute infrastructure [CLM-004].",
+    "operational_impact": "Operational degradation impacted the public-facing gateway PORTAL-01, resulting in approximately 47 minutes of total service disruption between 02:35 UTC and 03:22 UTC [CLM-001]. Secondary services on APP-02 experienced heavy compute starvation, while AUTH-01 was leveraged for credential replay [CLM-004]. Post-incident database integrity audits confirm no unauthorized database alterations or classified data compromise occurred.",
+    "disruption_duration_minutes": 47,
+    "affected_systems": [
+      "PORTAL-01",
+      "APP-02",
+      "AUTH-01"
+    ],
+    "key_timeline_highlights": [
+      "02:14 UTC - Anomalous login detected for account 'admin-research' from external IP 185.203.117.42 [CLM-002].",
+      "02:22 UTC - Lateral movement confirmed from AUTH-01 to backend computation node APP-02 [CLM-004].",
+      "02:35 UTC - Service degradation initiated on PORTAL-01, lasting 47 minutes [CLM-001].",
+      "03:07 UTC - Attacker ingress IP blackholed at perimeter and credentials revoked.",
+      "03:22 UTC - Containment completed and full production services restored across all affected nodes [CLM-005]."
+    ],
+    "current_status": "CONTAINED & RESTORED. As of 03:22 UTC, core services on PORTAL-01 and APP-02 have been completely restored to nominal baseline. The 'admin-research' account has been revoked, session caches flushed, and perimeter ingress from 185.203.117.42 is permanently blocked [CLM-005].",
+    "important_uncertainties": [
+      "Threat Actor Attribution: No forensic link to a specific APT group, nation-state sponsor, or known cybercriminal syndicate has been established.",
+      "Initial Credential Compromise Vector: The exact initial exfiltration mechanism for the 'admin-research' session token (phishing, infostealer, or man-in-the-middle) remains under forensic analysis."
+    ],
+    "attribution_status": "UNCONFIRMED",
+    "cited_claim_ids": [
+      "CLM-001",
+      "CLM-002",
+      "CLM-004",
+      "CLM-005",
+      "CLM-006"
+    ],
+    "content_markdown": "# Executive Summary: Operation Silver Falcon Incident Response\n**Case Identifier:** INC-2026-0417  \n**Classification:** TLP:AMBER | RESTRICTED  \n**Assigned Severity:** SEVERITY-HIGH  \n**Date of Report:** 17 April 2026  \n\n---\n\n## 1. Executive Incident Overview\nOn 17 April 2026 at 02:14 UTC, the Security Operations Center (SOC) detected an anomalous privileged authentication event targeting the core Research Portal infrastructure. An unauthorized session was initiated through the compromised administrative account 'admin-research' from external IP 185.203.117.42, bypassing standard MFA protocols via token replay [CLM-002]. Lateral movement was subsequently executed toward backend compute infrastructure [CLM-004].\n\n## 2. Operational Impact & Disruption Window\nOperational degradation impacted the public-facing gateway PORTAL-01, resulting in approximately 47 minutes of total service disruption between 02:35 UTC and 03:22 UTC [CLM-001]. Secondary services on APP-02 experienced heavy compute starvation, while AUTH-01 was leveraged for credential replay [CLM-004]. Post-incident database integrity audits confirm no unauthorized database alterations or classified data compromise occurred.\n\n- **Total Disruption Duration:** **47 minutes** [CLM-001]\n- **Affected Infrastructure Assets:** PORTAL-01, APP-02, AUTH-01 [CLM-004]\n\n## 3. Chronological Incident Highlights\n- 02:14 UTC - Anomalous login detected for account 'admin-research' from external IP 185.203.117.42 [CLM-002].\n- 02:22 UTC - Lateral movement confirmed from AUTH-01 to backend computation node APP-02 [CLM-004].\n- 02:35 UTC - Service degradation initiated on PORTAL-01, lasting 47 minutes [CLM-001].\n- 03:07 UTC - Attacker ingress IP blackholed at perimeter and credentials revoked.\n- 03:22 UTC - Containment completed and full production services restored across all affected nodes [CLM-005].\n\n\n## 4. Current Operational & Containment Status\nCONTAINED & RESTORED. As of 03:22 UTC, core services on PORTAL-01 and APP-02 have been completely restored to nominal baseline. The 'admin-research' account has been revoked, session caches flushed, and perimeter ingress from 185.203.117.42 is permanently blocked [CLM-005].\n\n## 5. Attribution & Intelligence Assessment\n**Attribution Status: UNCONFIRMED. Digital forensics confirms no definitive evidence associating the intrusion with any known Advanced Persistent Threat (APT) group or specific nation-state sponsor. Public attribution is strictly unsupported at this stage [CLM-006].**\n\n## 6. Key Uncertainties & Gaps Under Forensic Investigation\n- **Threat Actor Attribution:**  No forensic link to a specific APT group, nation-state sponsor, or known cybercriminal syndicate has been established.\n- **Initial Credential Compromise Vector:**  The exact initial exfiltration mechanism for the 'admin-research' session token (phishing, infostealer, or man-in-the-middle) remains under forensic analysis.\n\n\n---\n*Grounded Canonical Claim Citations: CLM-001, CLM-002, CLM-004, CLM-005, CLM-006*\n",
+    "generated_at": "2026-10-08T04:23:54.098857+00:00"
+  },
+  "security_advisory": {
+    "title": "Technical Security Advisory: Session Replay & Infrastructure Hardening (SEC-ADV-2026-0417)",
+    "case_id": "INC-2026-0417",
+    "advisory_id": "SEC-ADV-2026-0417",
+    "severity": "SEVERITY-HIGH",
+    "summary": "On 17 April 2026 at 02:14 UTC, SOC telemetry recorded unauthorized access to identity service AUTH-01 using privileged account 'admin-research' originating from external IP 185.203.117.42 [CLM-002, CLM-003]. The actor replayed existing session tokens to circumvent MFA challenges, moved laterally to backend server APP-02 via SSH, and executed a resource exhaustion payload causing service degradation on PORTAL-01 [CLM-004].",
+    "affected_systems": [
+      "PORTAL-01",
+      "APP-02",
+      "AUTH-01"
+    ],
+    "observed_indicators": [
+      {
+        "type": "IPv4 Address",
+        "value": "185.203.117.42",
+        "description": "Attacker ingress host (Hosting Provider Proxy / AS208046)"
+      },
+      {
+        "type": "Account Name",
+        "value": "admin-research",
+        "description": "Compromised privileged account targeted for session replay"
+      },
+      {
+        "type": "Malware Staging Path",
+        "value": "/tmp/.x11-unix/.falcon_pipe",
+        "description": "Staged python reverse shell script"
+      },
+      {
+        "type": "File MD5 Hash",
+        "value": "e4d909c290d0fb1ca068ffaddf22cbd0",
+        "description": "MD5 checksum of falcon_pipe reverse shell tool"
+      }
+    ],
+    "impact": "Degraded availability of public research gateway PORTAL-01 for 47 minutes (02:35 to 03:22 UTC) [CLM-001]. Unauthorized command execution on APP-02. No database tamper or exfiltration of classified datasets detected.",
+    "recommended_actions": [
+      "1. Invalidate all active session tokens immediately for privileged user tiers across SSO/Identity providers.",
+      "2. Enforce phishing-resistant hardware MFA (FIDO2 / WebAuthn) for administrative accounts to prevent session token replay.",
+      "3. Ingest perimeter IoC: Block ingress traffic from IPv4 185.203.117.42 across perimeter firewalls and CDNs.",
+      "4. Network segmentation: Strictly isolate backend computational nodes (APP-02) from public ingress gateways (PORTAL-01).",
+      "5. Rotate Kerberos KRBTGT and authentication tickets on identity provider AUTH-01 following session replay events."
+    ],
+    "current_status": "CONTAINED. Attacker session killed, IP blackholed at edge router, 'admin-research' credentials revoked, and PORTAL-01 returned to full operational state after 47 minutes of downtime [CLM-005].",
+    "attribution_status": "UNCONFIRMED",
+    "cited_claim_ids": [
+      "CLM-001",
+      "CLM-002",
+      "CLM-003",
+      "CLM-004",
+      "CLM-005",
+      "CLM-006",
+      "CLM-007"
+    ],
+    "content_markdown": "# Technical Security Advisory: Session Replay & Infrastructure Hardening (SEC-ADV-2026-0417)\n**Advisory Tracking ID:** SEC-ADV-2026-0417  \n**Case Reference:** INC-2026-0417  \n**Severity:** SEVERITY-HIGH  \n**Published Date:** 17 April 2026  \n**Audience:** Government cybersecurity and security operations teams  \n\n---\n\n## 1. Executive & Technical Summary\nOn 17 April 2026 at 02:14 UTC, SOC telemetry recorded unauthorized access to identity service AUTH-01 using privileged account 'admin-research' originating from external IP 185.203.117.42 [CLM-002, CLM-003]. The actor replayed existing session tokens to circumvent MFA challenges, moved laterally to backend server APP-02 via SSH, and executed a resource exhaustion payload causing service degradation on PORTAL-01 [CLM-004].\n\n## 2. Affected Infrastructure\nThe following core infrastructure assets were confirmed involved in the attack path:\n- **PORTAL-01**\n- **APP-02**\n- **AUTH-01**\n\n\n## 3. Indicators of Compromise (IoCs)\n| Indicator Type | Value | Context / Notes |\n| :--- | :--- | :--- |\n| IPv4 Address | `185.203.117.42` | Attacker ingress host (Hosting Provider Proxy / AS208046) |\n| Account Name | `admin-research` | Compromised privileged account targeted for session replay |\n| Malware Staging Path | `/tmp/.x11-unix/.falcon_pipe` | Staged python reverse shell script |\n| File MD5 Hash | `e4d909c290d0fb1ca068ffaddf22cbd0` | MD5 checksum of falcon_pipe reverse shell tool |\n\n\n## 4. Operational & Infrastructure Impact\nDegraded availability of public research gateway PORTAL-01 for 47 minutes (02:35 to 03:22 UTC) [CLM-001]. Unauthorized command execution on APP-02. No database tamper or exfiltration of classified datasets detected.\n\n## 5. Recommended Mitigation & Remediation Actions\n- 1. Invalidate all active session tokens immediately for privileged user tiers across SSO/Identity providers.\n- 2. Enforce phishing-resistant hardware MFA (FIDO2 / WebAuthn) for administrative accounts to prevent session token replay.\n- 3. Ingest perimeter IoC: Block ingress traffic from IPv4 185.203.117.42 across perimeter firewalls and CDNs.\n- 4. Network segmentation: Strictly isolate backend computational nodes (APP-02) from public ingress gateways (PORTAL-01).\n- 5. Rotate Kerberos KRBTGT and authentication tickets on identity provider AUTH-01 following session replay events.\n\n\n## 6. Current Containment Status\nCONTAINED. Attacker session killed, IP blackholed at edge router, 'admin-research' credentials revoked, and PORTAL-01 returned to full operational state after 47 minutes of downtime [CLM-005].\n\n## 7. Threat Actor Attribution Notice\n**UNCONFIRMED. Forensic analysis has NOT linked this activity to any known threat actor group or nation-state. Do not attribute this incident publicly without confirmed telemetry [CLM-006].**\n\n---\n*Grounded Canonical Claim References: CLM-001, CLM-002, CLM-003, CLM-004, CLM-005, CLM-006, CLM-007*\n",
+    "generated_at": "2026-10-08T04:23:54.099450+00:00"
+  },
+  "social_media": {
+    "platform": "Public Awareness / Security Update",
+    "post_text": "Security Update: Earlier today, our SOC detected and isolated an unauthorized access event targeting the Research Portal. The incident resulted in approximately 47 minutes of service disruption before containment protocols were completed at 03:22 UTC [CLM-001, CLM-005].\n\nAll services across PORTAL-01 are fully restored [CLM-005]. Database audits confirm core data integrity was not compromised. Attribution remains unconfirmed at this stage [CLM-006]. We remain dedicated to full transparency and robust platform security.",
+    "character_count": 524,
+    "hashtags": [
+      "#CyberSecurity",
+      "#IncidentResponse",
+      "#SecOps",
+      "#Transparency"
+    ],
+    "attribution_status": "UNCONFIRMED",
+    "service_status": "Fully restored after 47 minutes disruption",
+    "cited_claim_ids": [
+      "CLM-001",
+      "CLM-004",
+      "CLM-005",
+      "CLM-006"
+    ],
+    "generated_at": "2026-10-08T04:23:54.099518+00:00"
+  },
+  "presentation": {
+    "deck_title": "Incident Briefing Deck: Operation Silver Falcon Response & Lessons Learned",
+    "case_id": "INC-2026-0417",
+    "target_audience": "Technical Steering Committee, CISO, and Operations Review Board",
+    "total_slides": 5,
+    "slides": [
+      {
+        "slide_number": 1,
+        "title": "Incident Overview & Classification",
+        "key_points": [
+          "Incident Code: INC-2026-0417 (Operation Silver Falcon)",
+          "Severity Level: SEVERITY-HIGH (Tier 2 Incident)",
+          "Detection Date & Time: 17 April 2026 at 02:14 UTC [CLM-002]",
+          "Core Issue: Privileged credential token replay targeting research infrastructure",
+          "Threat Actor Attribution: Strictly UNCONFIRMED [CLM-006]"
+        ],
+        "visual_recommendation": "Header card with high severity badge, summary card layout, and red warning icon",
+        "claim_refs": [
+          "CLM-002",
+          "CLM-006"
+        ]
+      },
+      {
+        "slide_number": 2,
+        "title": "Chronological Incident Timeline",
+        "key_points": [
+          "01:58 UTC - Edge reconnaissance detected against load balancer from 185.203.117.42 [CLM-003]",
+          "02:14 UTC - Unauthorized session opened via 'admin-research' account [CLM-002]",
+          "02:22 UTC - Lateral movement across internal SSH to backend server APP-02 [CLM-004]",
+          "02:35 UTC - Disruption on PORTAL-01 begins due to resource starvation (47m total) [CLM-001]",
+          "03:07 UTC - IP blackholed at border gateway and account disabled across LDAP/SSO",
+          "03:22 UTC - Containment completed and full restoration confirmed [CLM-005]"
+        ],
+        "visual_recommendation": "Linear horizontal timeline chevron graphic with timestamps highlighted",
+        "claim_refs": [
+          "CLM-001",
+          "CLM-002",
+          "CLM-003",
+          "CLM-005"
+        ]
+      },
+      {
+        "slide_number": 3,
+        "title": "Affected Systems & Operational Impact",
+        "key_points": [
+          "Operational Outage: Research portal offline for approximately 47 minutes [CLM-001]",
+          "PORTAL-01: Public-facing gateway listeners starved of requests [CLM-004]",
+          "APP-02: Backend compute node subjected to unauthorized script execution [CLM-004]",
+          "AUTH-01: Identity service where session token was replayed [CLM-004]",
+          "Integrity Assessment: Zero database tampering or data exfiltration detected"
+        ],
+        "visual_recommendation": "3-column architecture diagram showing ingress traffic path from external IP to PORTAL-01, APP-02, and AUTH-01",
+        "claim_refs": [
+          "CLM-001",
+          "CLM-004"
+        ]
+      },
+      {
+        "slide_number": 4,
+        "title": "Technical Findings & Indicators of Compromise",
+        "key_points": [
+          "Attacker Ingress IP: 185.203.117.42 (Proxy AS208046) [CLM-003]",
+          "Compromised Account: admin-research (UID 1042) [CLM-002]",
+          "Tooling: Python reverse shell staged at /tmp/.x11-unix/.falcon_pipe [CLM-007]",
+          "Malware Hash: MD5 e4d909c290d0fb1ca068ffaddf22cbd0 [CLM-007]",
+          "Attribution Note: Tool strings and shared hosting do NOT substantiate attribution [CLM-006]"
+        ],
+        "visual_recommendation": "IoC table layout with copyable hashes and forensic tags",
+        "claim_refs": [
+          "CLM-002",
+          "CLM-003",
+          "CLM-006",
+          "CLM-007"
+        ]
+      },
+      {
+        "slide_number": 5,
+        "title": "Response, Containment & Remediation Roadmap",
+        "key_points": [
+          "Emergency Actions: Ingress IP blackholed, session terminated, 'admin-research' credentials reset",
+          "Restoration: PORTAL-01 & APP-02 restored to production as of 03:22 UTC [CLM-005]",
+          "Mitigation 1: Enforce hardware FIDO2 MFA across all privileged accounts",
+          "Mitigation 2: Implement microsegmentation between gateway PORTAL-01 and backend APP-02",
+          "Mitigation 3: Rotate Kerberos KRBTGT keys across the entire SSO domain"
+        ],
+        "visual_recommendation": "Two-part split slide: Left side showing Immediate Containment Actions, Right side showing Long-term Hardening",
+        "claim_refs": [
+          "CLM-005"
+        ]
+      }
+    ],
+    "cited_claim_ids": [
+      "CLM-001",
+      "CLM-002",
+      "CLM-003",
+      "CLM-004",
+      "CLM-005",
+      "CLM-006",
+      "CLM-007"
+    ],
+    "generated_at": "2026-10-08T04:23:54.099544+00:00"
+  },
+  "video_script": {
+    "script_title": "Video Briefing Script: Operation Silver Falcon Quick-Response Overview",
+    "case_id": "INC-2026-0417",
+    "target_duration_seconds": 70,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "duration_seconds": 15,
+        "visual_description": "Opening motion graphic showing Security Operations Center dashboard with flashing alert banner and case title.",
+        "narration": "On April 17th at 02:14 UTC, security automated monitoring detected an unauthorized authentication event targeting our core research infrastructure.",
+        "on_screen_text": "SECURITY ALERT | INC-2026-0417 | 02:14 UTC",
+        "supporting_claim_ids": [
+          "CLM-002"
+        ]
+      },
+      {
+        "scene_number": 2,
+        "duration_seconds": 20,
+        "visual_description": "Split screen displaying network diagram showing ingress from external IP 185.203.117.42 to identity service AUTH-01 and backend compute APP-02.",
+        "narration": "The threat actor bypassed authentication challenges through session token replay on privileged account admin-research, attempting lateral movement to computational systems.",
+        "on_screen_text": "INGRESS IP: 185.203.117.42 | PRIVILEGED REPLAY DETECTED",
+        "supporting_claim_ids": [
+          "CLM-002",
+          "CLM-003",
+          "CLM-004"
+        ]
+      },
+      {
+        "scene_number": 3,
+        "duration_seconds": 20,
+        "visual_description": "Graphic depicting portal status clock and restoration curve showing outage duration and rapid response stabilization.",
+        "narration": "This activity caused approximately 47 minutes of service disruption on Research Portal 01 before rapid containment protocols took effect.",
+        "on_screen_text": "PORTAL-01 DISRUPTION: 47 MINUTES | CONTAINED AT 03:22 UTC",
+        "supporting_claim_ids": [
+          "CLM-001",
+          "CLM-005"
+        ]
+      },
+      {
+        "scene_number": 4,
+        "duration_seconds": 15,
+        "visual_description": "Closing graphic with green shield badge showing system restored, key hardening items, and official notification.",
+        "narration": "All systems are now fully restored, credential caches rotated, and attribution remains unconfirmed as forensic investigations proceed.",
+        "on_screen_text": "SERVICES RESTORED | ATTRIBUTION: UNCONFIRMED",
+        "supporting_claim_ids": [
+          "CLM-005",
+          "CLM-006"
+        ]
+      }
+    ],
+    "attribution_status": "UNCONFIRMED",
+    "cited_claim_ids": [
+      "CLM-001",
+      "CLM-002",
+      "CLM-004",
+      "CLM-005",
+      "CLM-006"
+    ],
+    "generated_at": "2026-10-08T04:23:54.099566+00:00"
+  }
+}

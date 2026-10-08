@@ -1,0 +1,13 @@
+================================================================================
+INCIDENT OPERATIONAL CONTEXT: INC-2026-0417
+================================================================================
+
+ORGANIZATION: National Research & Scientific Computing Infrastructure
+INCIDENT NAME: Operation Silver Falcon
+INCIDENT MANAGER: Deputy CISO Security Directorate
+
+KEY CONTEXTUAL POINTS:
+1. The Research Portal serves academic and government cybersecurity researchers across the nation.
+2. The 47-minute disruption occurred during low-traffic overnight hours (02:35 to 03:22 UTC), mitigating broader operational impact.
+3. Rapid detection was enabled by anomaly detection thresholds flagging the foreign IP 185.203.117.42 accessing 'admin-research' without compliant geo-telemetry.
+4. Communications priority: Maintain factual integrity, highlight rapid containment, warn peer organizations regarding credential replay defenses, and avoid speculative attribution.

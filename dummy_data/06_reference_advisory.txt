@@ -1,0 +1,16 @@
+================================================================================
+REFERENCE SECURITY ADVISORY TEMPLATE & GUIDANCE (SEC-ADV-2026-REF)
+================================================================================
+
+TITLE: Handling Unauthorized Session Replay & Multi-Tier Infrastructure Defense
+
+TARGET AUDIENCE: Government cybersecurity and security operations teams
+TONE: Professional, factual, and concise
+COMMUNICATION OBJECTIVE: Awareness and response
+
+RECOMMENDED MITIGATIONS:
+1. Revoke session tokens upon detection of IP/ASN velocity anomalies.
+2. Enforce phishing-resistant hardware MFA (FIDO2 / WebAuthn) for privileged tier accounts (e.g., admin-research).
+3. Isolate core application servers (APP-02) from public ingress portals (PORTAL-01) using strict microsegmentation.
+4. Rotate Kerberos KRBTGT and SSO signing keys following any confirmed session replay incident.
+5. Ingest perimeter IoC: Block ingress traffic from 185.203.117.42.

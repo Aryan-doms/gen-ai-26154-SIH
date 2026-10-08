@@ -1,0 +1,35 @@
+{
+  "title": "Executive Summary: Operation Silver Falcon Incident Response",
+  "case_id": "INC-2026-0417",
+  "severity": "SEVERITY-HIGH",
+  "incident_overview": "On 17 April 2026 at 02:14 UTC, the Security Operations Center (SOC) detected an anomalous privileged authentication event targeting the core Research Portal infrastructure. An unauthorized session was initiated through the compromised administrative account 'admin-research' from external IP 185.203.117.42, bypassing standard MFA protocols via token replay [CLM-002]. Lateral movement was subsequently executed toward backend compute infrastructure [CLM-004].",
+  "operational_impact": "Operational degradation impacted the public-facing gateway PORTAL-01, resulting in approximately 47 minutes of total service disruption between 02:35 UTC and 03:22 UTC [CLM-001]. Secondary services on APP-02 experienced heavy compute starvation, while AUTH-01 was leveraged for credential replay [CLM-004]. Post-incident database integrity audits confirm no unauthorized database alterations or classified data compromise occurred.",
+  "disruption_duration_minutes": 47,
+  "affected_systems": [
+    "PORTAL-01",
+    "APP-02",
+    "AUTH-01"
+  ],
+  "key_timeline_highlights": [
+    "02:14 UTC - Anomalous login detected for account 'admin-research' from external IP 185.203.117.42 [CLM-002].",
+    "02:22 UTC - Lateral movement confirmed from AUTH-01 to backend computation node APP-02 [CLM-004].",
+    "02:35 UTC - Service degradation initiated on PORTAL-01, lasting 47 minutes [CLM-001].",
+    "03:07 UTC - Attacker ingress IP blackholed at perimeter and credentials revoked.",
+    "03:22 UTC - Containment completed and full production services restored across all affected nodes [CLM-005]."
+  ],
+  "current_status": "CONTAINED & RESTORED. As of 03:22 UTC, core services on PORTAL-01 and APP-02 have been completely restored to nominal baseline. The 'admin-research' account has been revoked, session caches flushed, and perimeter ingress from 185.203.117.42 is permanently blocked [CLM-005].",
+  "important_uncertainties": [
+    "Threat Actor Attribution: No forensic link to a specific APT group, nation-state sponsor, or known cybercriminal syndicate has been established.",
+    "Initial Credential Compromise Vector: The exact initial exfiltration mechanism for the 'admin-research' session token (phishing, infostealer, or man-in-the-middle) remains under forensic analysis."
+  ],
+  "attribution_status": "UNCONFIRMED",
+  "cited_claim_ids": [
+    "CLM-001",
+    "CLM-002",
+    "CLM-004",
+    "CLM-005",
+    "CLM-006"
+  ],
+  "content_markdown": "# Executive Summary: Operation Silver Falcon Incident Response\n**Case Identifier:** INC-2026-0417  \n**Classification:** TLP:AMBER | RESTRICTED  \n**Assigned Severity:** SEVERITY-HIGH  \n**Date of Report:** 17 April 2026  \n\n---\n\n## 1. Executive Incident Overview\nOn 17 April 2026 at 02:14 UTC, the Security Operations Center (SOC) detected an anomalous privileged authentication event targeting the core Research Portal infrastructure. An unauthorized session was initiated through the compromised administrative account 'admin-research' from external IP 185.203.117.42, bypassing standard MFA protocols via token replay [CLM-002]. Lateral movement was subsequently executed toward backend compute infrastructure [CLM-004].\n\n## 2. Operational Impact & Disruption Window\nOperational degradation impacted the public-facing gateway PORTAL-01, resulting in approximately 47 minutes of total service disruption between 02:35 UTC and 03:22 UTC [CLM-001]. Secondary services on APP-02 experienced heavy compute starvation, while AUTH-01 was leveraged for credential replay [CLM-004]. Post-incident database integrity audits confirm no unauthorized database alterations or classified data compromise occurred.\n\n- **Total Disruption Duration:** **47 minutes** [CLM-001]\n- **Affected Infrastructure Assets:** PORTAL-01, APP-02, AUTH-01 [CLM-004]\n\n## 3. Chronological Incident Highlights\n- 02:14 UTC - Anomalous login detected for account 'admin-research' from external IP 185.203.117.42 [CLM-002].\n- 02:22 UTC - Lateral movement confirmed from AUTH-01 to backend computation node APP-02 [CLM-004].\n- 02:35 UTC - Service degradation initiated on PORTAL-01, lasting 47 minutes [CLM-001].\n- 03:07 UTC - Attacker ingress IP blackholed at perimeter and credentials revoked.\n- 03:22 UTC - Containment completed and full production services restored across all affected nodes [CLM-005].\n\n\n## 4. Current Operational & Containment Status\nCONTAINED & RESTORED. As of 03:22 UTC, core services on PORTAL-01 and APP-02 have been completely restored to nominal baseline. The 'admin-research' account has been revoked, session caches flushed, and perimeter ingress from 185.203.117.42 is permanently blocked [CLM-005].\n\n## 5. Attribution & Intelligence Assessment\n**Attribution Status: UNCONFIRMED. Digital forensics confirms no definitive evidence associating the intrusion with any known Advanced Persistent Threat (APT) group or specific nation-state sponsor. Public attribution is strictly unsupported at this stage [CLM-006].**\n\n## 6. Key Uncertainties & Gaps Under Forensic Investigation\n- **Threat Actor Attribution:**  No forensic link to a specific APT group, nation-state sponsor, or known cybercriminal syndicate has been established.\n- **Initial Credential Compromise Vector:**  The exact initial exfiltration mechanism for the 'admin-research' session token (phishing, infostealer, or man-in-the-middle) remains under forensic analysis.\n\n\n---\n*Grounded Canonical Claim Citations: CLM-001, CLM-002, CLM-004, CLM-005, CLM-006*\n",
+  "generated_at": "2026-10-07T12:23:00.213325+00:00"
+}

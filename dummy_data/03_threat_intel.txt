@@ -1,0 +1,14 @@
+================================================================================
+THREAT INTELLIGENCE DOSSIER: INC-2026-0417
+SUBJECT: INFRASTRUCTURE & ATTRIBUTION ASSESSMENT
+================================================================================
+
+1. OBSERVED INDICATORS OF COMPROMISE (IoCs)
+- IPv4: 185.203.117.42 (Autonomous System: AS208046, Hosting Provider Proxy)
+- Target Account: admin-research (UID: 1042)
+- User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+- Malware / Tooling: Custom python reverse shell staged under /tmp/.x11-unix/.falcon_pipe (MD5: e4d909c290d0fb1ca068ffaddf22cbd0)
+
+2. ATTRIBUTION NOTE (CRITICAL)
+- Attribution: UNCONFIRMED.
+- Analysis: While the staging script mentions "falcon_pipe", forensic teams caution that adversary names, strings, and infrastructure appear shared among multiple commercial bulletproof hosting providers. No nation-state or specific threat actor group can be attributed. Any public attribution is strictly unsubstantiated at this stage.

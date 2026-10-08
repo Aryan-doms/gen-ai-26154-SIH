@@ -1,0 +1,17 @@
+================================================================================
+INCIDENT CHRONOLOGICAL TIMELINE: OPERATION SILVER FALCON
+CASE ID: INC-2026-0417
+RECORDED BY: SOC LEAD ANALYST
+================================================================================
+
+All timestamps are in UTC, 17 April 2026:
+
+01:58 UTC - Initial port reconnaissance against edge load balancer from IP 185.203.117.42.
+02:14 UTC - Suspicious authentication event: privileged user 'admin-research' logged in successfully from 185.203.117.42 without expected hardware MFA challenge (bypassed via session token replay).
+02:22 UTC - Lateral movement initiated from AUTH-01 to APP-02 via internal SSH tunnel using cached administrative credentials.
+02:35 UTC - Disruption begins on PORTAL-01 as resource starvation script executed on APP-02 triggers service degradation.
+02:48 UTC - Automated SOC alert SEV-1 fired: "PORTAL-01 Heartbeat Failure & Abnormal CPU Utilization on APP-02".
+02:55 UTC - Incident Response Team mobilized. Network containment initiated.
+03:07 UTC - IP 185.203.117.42 blackholed at edge border gateway. 'admin-research' account disabled across LDAP/SSO.
+03:22 UTC - Containment completed. PORTAL-01 services restored to full operational capacity. Total disruption window: 47 minutes.
+04:00 UTC - Post-incident triage initiated. Memory dumps and system logs captured for offline forensic examination.
