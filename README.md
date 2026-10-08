@@ -1,54 +1,49 @@
 # Gen AI Platform for Automated Content Transformation
 ### Smart India Hackathon (SIH) 2026 · Problem Statement 26154 (NTRO)
 
-> **An institutional, multi-agent content transformation workstation that converts raw multimodal incident dossiers into verified, grounded communication work products across 9 official deliverables with deterministic cross-checking, human review gates, Stage 7 selective impact propagation, and cryptographic auditability.**
+> **A multi-agent content transformation platform that converts source project documents into verified, grounded communication deliverables across 9 formats with automated cross-checking, editorial review controls, selective fact updates, and auditability.**
 
 ---
 
 ## Key Highlights
 
-- **9 Universal Deliverables**: Executive Summary, Technical Advisory, Briefing Deck, Infographic, Video Package Script, Twitter/X Post, WhatsApp Dispatch, LinkedIn Post, and Instagram Caption.
-- **Multimodal Ingestion & Verification**: SHA-256 cryptographic hashing of PDFs, telemetry diagrams, authentication logs, and media files.
-- **Dynamic Token Budgeting**: Pre-flight token counting (`client.count_tokens()`) routing $< 32\text{k}$ tokens inline and $\ge 32\text{k}$ tokens through Gemini File API + `CachedContent` with lazy rehydration.
-- **Canonical Grounding**: Atomic fact extraction (`CLM-001..007`) establishing bidirectional claim-to-source traceability.
-- **Stage 7 "Fix Once → Update Everywhere"**: Evaluates dependency graphs when a factual claim is updated. **Core Invariant**: Unaffected approved deliverables are strictly preserved at `v1 Approved` with zero token waste; affected deliverables selectively regenerate `v2 Needs review`.
-- **SLM Domain Boundary Gatekeeper**: Intercepts and rejects off-domain queries (generic programming, trivia) with an institutional **Operational Boundary Notice**, while providing grounded briefings citing canonical claims for in-domain incident queries.
-- **Human Review Gates**: No automated publication. Reviewers can edit, apply natural language prompt revisions, inspect diffs, and approve.
-- **Polygon Blockchain Anchoring**: Hash seals and publication manifests recorded on the Polygon Amoy testnet for immutable auditability.
+- **9 Universal Deliverables**: Executive Summary, Advisory, Presentation, Infographic, Video Package, Twitter / X Post, WhatsApp, LinkedIn Post, and Instagram Post.
+- **Multimodal Document Ingestion**: Ingests and validates documents, spreadsheets, logs, and diagrammatic assets.
+- **Canonical Grounding**: Atomic fact and claim extraction establishing bidirectional traceability back to source files.
+- **Selective Fact Propagation**: When a source fact is updated, the dependency graph identifies and updates only affected deliverables, keeping approved unaffected work untouched.
+- **In-Domain Context Assistant**: Intelligent query assistant grounded in project source facts, designed to stay strictly focused on the current project context.
+- **Editorial Review Controls**: Full human-in-the-loop oversight. Reviewers can edit text, request prompt adjustments, inspect revision diffs, and approve deliverables.
+- **Tamper-Evident Audit Verification**: Cryptographic hashing and verification manifest for publication-ready outputs.
 
 ---
 
-## Architectural Pipeline
+## Transformation Pipeline
 
 ```
-Raw Dossier (PDFs, Logs, PNG, MP4)
+Source Documents (PDFs, Reports, Images, Notes)
         ↓
-[ SHA-256 Manifest Seal ]
+[ Document Ingestion & Verification ]
         ↓
-[ Dynamic Token Budgeting (< 32k inline / ≥ 32k Gemini File API Cache) ]
+[ Canonical Fact & Evidence Extraction ]
         ↓
-[ Canonical Representation Extractor (CLM-001..CLM-007) ]
-        ↓
-[ Transformation Planner (Operator Config + Deliverable Overrides) ]
+[ Transformation Planner (Audience, Tone, Deliverable Settings) ]
         ↓
 ┌────────────────────────────────────────────────────────┐
-│   9 Parallel Creator Agents (Throttled Semaphore = 3)  │
-│   • Executive Summary        • Technical Advisory      │
-│   • Briefing Deck            • Infographic Data        │
-│   • Video Package Script     • Twitter / X Thread      │
-│   • WhatsApp Dispatch        • LinkedIn Post           │
-│   • Instagram Caption                                  │
+│   Tailored Deliverable Creators                        │
+│   • Executive Summary        • Advisory                │
+│   • Presentation             • Infographic             │
+│   • Video Package            • Twitter / X Post        │
+│   • WhatsApp                 • LinkedIn Post           │
+│   • Instagram Post                                     │
 └────────────────────────────────────────────────────────┘
         ↓
-[ Deterministic Cross-Checker (0 Numerical / Timeline / Scope Drift) ]
+[ Automated Cross-Consistency & Fact Verification ]
         ↓
-[ Pydantic Schema & Grounding Validator ]
+[ Editorial Review Workspace (Diff View / Prompt / Manual Edit) ]
         ↓
-[ Human Review Gate (Diff View / Prompt Edit / Manual Edit) ]
+[ Targeted Fact Updates (Updates only affected deliverables) ]
         ↓
-[ Stage 7: Fix Once → Selective Impact Regeneration (Core Invariant) ]
-        ↓
-[ Final Publication & Polygon Amoy Blockchain Anchoring ]
+[ Final Export & Verification Manifest ]
 ```
 
 ---
@@ -58,16 +53,16 @@ Raw Dossier (PDFs, Logs, PNG, MP4)
 ```
 ├── backend/
 │   ├── app/
-│   │   ├── agents/            # 9 specialized creator agent modules
+│   │   ├── agents/            # 9 specialized deliverable creator modules
 │   │   ├── models/            # Pydantic schemas (canonical, impact, operator, assistant)
-│   │   ├── services/          # Gemini client, in-memory store, gatekeeper, blockchain
+│   │   ├── services/          # Gemini client, in-memory store, gatekeeper, verification
 │   │   ├── workflow/          # Planner, cross-checker, validator, impact evaluator, regenerator
 │   │   ├── config.py          # Environment settings
 │   │   └── main.py            # FastAPI endpoints
 │   ├── test_api.py            # Core endpoint test suite
-│   ├── test_assistant_gatekeeper.py # SLM gatekeeper boundary test suite
-│   ├── test_stage6_flow.py    # Human review workflow verification
-│   ├── test_stage7_invariant.py # Stage 7 invariant preservation verification
+│   ├── test_assistant_gatekeeper.py # Assistant domain boundary test suite
+│   ├── test_stage6_flow.py    # Editorial review workflow test suite
+│   ├── test_stage7_invariant.py # Selective update preservation test suite
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
@@ -77,7 +72,7 @@ Raw Dossier (PDFs, Logs, PNG, MP4)
 │   │   └── main.jsx
 │   ├── package.json
 │   └── vite.config.js
-├── dummy_data/                # Raw multimodal sample dossier (logs, timeline, reports, diagrams)
+├── dummy_data/                # Sample source documents and project data
 ├── .env.example               # Configuration template
 ├── .gitignore                 # Strict repository hygiene rules
 ├── requirements.txt           # Python root dependencies
@@ -140,18 +135,18 @@ PYTHONPATH=backend python backend/test_stage6_flow.py
 PYTHONPATH=backend python backend/test_stage7_invariant.py
 ```
 
-All 4 test suites verify 100% passing status across:
-- All 6 FastAPI endpoints (`/work`, `/transform`, `/edit`, `/approve`, `/claims/{id}`, `/assistant/query`).
-- SLM Gatekeeper domain boundary rejection for off-domain queries.
-- Human review sign-off and reset state rules.
-- Stage 7 invariant: 4 unaffected approved artifacts retained at v1; 5 affected artifacts selectively regenerated to v2.
+All test suites verify:
+- Core API endpoints (`/work`, `/transform`, `/edit`, `/approve`, `/claims/{id}`, `/assistant/query`).
+- Context Assistant boundary enforcement for project queries.
+- Human review workflow (editing, diff tracking, sign-off).
+- Selective fact propagation: when a claim changes, unaffected approved deliverables remain intact while affected deliverables regenerate for review.
 
 ---
 
 ## Technical Specifications
 
 - **Backend**: Python 3.11+, FastAPI, Pydantic v2, Google GenAI SDK (`google-genai`).
-- **Frontend**: React 18, Vite, Lucide Icons, clean CSS variables (minimalist stone palette, zero AI-slop).
+- **Frontend**: React 18, Vite, Lucide Icons.
 - **Evaluation Criteria**: Grounding accuracy, cross-deliverable consistency, human editorial sovereignty, and selective regeneration efficiency.
 
 ---
