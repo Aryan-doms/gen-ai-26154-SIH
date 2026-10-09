@@ -54,6 +54,7 @@ export default function App() {
   });
   const [pendingPrompt, setPendingPrompt] = useState('');
   const [processingState, setProcessingState] = useState({
+    isProcessing: false,
     isReady: false,
     workId: null,
     workTitle: 'Operation Silver Falcon',
@@ -96,29 +97,42 @@ export default function App() {
 
   // Submit transformation configuration
   const handleTriggerTransformation = (payload) => {
-    const title = payload.title || 'Incident Dossier Transformation';
+    const title = payload.title || 'Operation Silver Falcon';
+    const targetWorkId = '2026-0417';
+
+    // 1. Immediately activate processing on target work URL
+    setActiveWorkId(targetWorkId);
     setProcessingState({
+      isProcessing: true,
       isReady: false,
-      workId: null,
+      workId: targetWorkId,
       workTitle: title,
       error: null
     });
-    navigate('/processing');
+    // 2. Navigate immediately to the /work/2026-0417 URL
+    navigate(`/work/${targetWorkId}`);
 
+    // 3. Fire API request in background
     createTransformation(payload)
       .then((res) => {
+        const finalId = res?.id || targetWorkId;
+        if (finalId !== targetWorkId) {
+          setActiveWorkId(finalId);
+          window.history.replaceState(null, '', `/work/${finalId}`);
+          setCurrentPath(`/work/${finalId}`);
+        }
         setProcessingState(prev => ({
           ...prev,
           isReady: true,
-          workId: res.id
+          workId: finalId
         }));
       })
       .catch((err) => {
-        console.warn("API transformation error, fallback to demo work:", err);
+        console.warn("API transformation fallback to demo work:", err);
         setProcessingState(prev => ({
           ...prev,
           isReady: true,
-          workId: '2026-0417',
+          workId: targetWorkId,
           error: err.message
         }));
       });
@@ -161,13 +175,14 @@ export default function App() {
           />
         )}
 
+        {/* Fallback for direct /processing URL visits */}
         {currentPath === '/processing' && (
           <ProcessingScreen 
             workTitle={processingState.workTitle}
-            workId={processingState.workId}
-            isReady={processingState.isReady}
+            workId={activeWorkId || '2026-0417'}
+            isReady={true}
             onComplete={() => {
-              const nextId = processingState.workId || activeWorkId || '2026-0417';
+              const nextId = activeWorkId || '2026-0417';
               setActiveWorkId(nextId);
               navigate(`/work/${nextId}`);
             }}
@@ -181,11 +196,22 @@ export default function App() {
               onBack={() => navigate(`/work/${activeWorkId}`)}
             />
           ) : currentPath.startsWith('/work') ? (
-            <WorkspaceScreen 
-              workId={activeWorkId}
-              onBack={() => navigate('/')}
-              onFinalize={() => navigate(`/work/${activeWorkId}/export`)}
-            />
+            processingState.isProcessing && processingState.workId === activeWorkId ? (
+              <ProcessingScreen 
+                workTitle={processingState.workTitle}
+                workId={activeWorkId}
+                isReady={processingState.isReady}
+                onComplete={() => {
+                  setProcessingState(prev => ({ ...prev, isProcessing: false }));
+                }}
+              />
+            ) : (
+              <WorkspaceScreen 
+                workId={activeWorkId}
+                onBack={() => navigate('/')}
+                onFinalize={() => navigate(`/work/${activeWorkId}/export`)}
+              />
+            )
           ) : null}
         </ErrorBoundary>
       </div>

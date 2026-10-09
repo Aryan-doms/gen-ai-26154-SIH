@@ -58,7 +58,7 @@ export default function ProcessingScreen({ workTitle, workId, isReady, onComplet
     }
   ];
 
-  // Advance steps smoothly (450ms per step for snappy, responsive feel)
+  // Advance steps smoothly (420ms per step for snappy, responsive feel)
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentStep(prev => {
@@ -67,32 +67,24 @@ export default function ProcessingScreen({ workTitle, workId, isReady, onComplet
         }
         return prev;
       });
-    }, 450);
+    }, 420);
 
     return () => clearInterval(timer);
   }, []);
 
-  // When all steps are done AND backend has completed, immediately transition to the editorial workspace
+  // When all 5 steps complete, smoothly transition to the editorial workspace
   useEffect(() => {
-    if (currentStep === 4 && isReady && !isFinishing) {
-      setIsFinishing(true);
+    if (currentStep === 4 && !isFinishing) {
+      const finishDelay = isReady ? 350 : 850;
       const timer = setTimeout(() => {
-        onComplete();
-      }, 350);
+        setIsFinishing(true);
+        if (onComplete) {
+          onComplete();
+        }
+      }, finishDelay);
       return () => clearTimeout(timer);
     }
   }, [currentStep, isReady, isFinishing, onComplete]);
-
-  // Safety fallback
-  useEffect(() => {
-    const safety = setTimeout(() => {
-      if (!isFinishing) {
-        setIsFinishing(true);
-        onComplete();
-      }
-    }, 20000);
-    return () => clearTimeout(safety);
-  }, [isFinishing, onComplete]);
 
   const allComplete = currentStep === 4 && isReady;
   const progressPercent = Math.min(100, Math.round(((currentStep + (allComplete ? 1 : 0.5)) / stages.length) * 100));
