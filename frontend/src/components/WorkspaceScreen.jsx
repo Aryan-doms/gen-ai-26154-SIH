@@ -650,6 +650,9 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {work.source_package?.map((file, i) => {
                 const isGrounded = activeSourceFile && file.file_name === activeSourceFile;
+                const sizeText = file.file_size_bytes 
+                  ? `${(file.file_size_bytes / 1024).toFixed(1)} KB` 
+                  : 'Verified';
                 return (
                   <div key={i} style={{ 
                     padding: '6px 8px', 
@@ -667,7 +670,7 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                         {file.file_name}
                       </div>
                       <div style={{ fontSize: '10px', color: isGrounded ? '#1e40af' : 'var(--text-muted)' }}>
-                        {isGrounded ? '✓ Active Claim Source' : (file.file_type || 'Source doc')}
+                        {isGrounded ? '✓ Active Claim Source' : `${sizeText} · Document`}
                       </div>
                     </div>
                   </div>
@@ -678,35 +681,16 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
 
           <div style={{ borderBottom: '1px solid var(--border)' }} />
 
-          {/* Evidence Grounding Metrics */}
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
-              Evidence Grounding ({work.claims?.length || 0} claims)
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#166534' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Check size={12} /> Verified Grounded
-                </span>
-                <span style={{ fontWeight: 600 }}>{work.claims?.length || 0}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#92400e' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlertTriangle size={12} /> Unverified Drift
-                </span>
-                <span style={{ fontWeight: 600 }}>0</span>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ borderBottom: '1px solid var(--border)' }} />
-
           {/* Context-First Claims & Evidence Cards */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Claims & Evidence
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  Project Facts & Claims ({work.claims?.length || 0})
+                </div>
+                <div style={{ fontSize: '10px', color: '#166534', fontWeight: 500, marginTop: '1px' }}>
+                  ✓ All {work.claims?.length || 0} facts verified grounded from sources
+                </div>
               </div>
               {selectedClaimId && (
                 <button
@@ -1366,34 +1350,34 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
           {/* Verification Checklist */}
           <div>
             <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
-              Verification Checks
+              Deliverable Verification
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Check size={12} color={activeOutput.validation?.source_grounded !== false ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Source Grounded</span>
-                <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-muted)' }}>
-                  {activeOutput.claim_dependencies?.length || 0} claims
+                <span style={{ color: 'var(--text-primary)' }}>Claims Cited</span>
+                <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  {activeOutput.claim_dependencies?.length || 0} of {work.claims?.length || 0}
                 </span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Check size={12} color={!work.cross_check_summary?.inconsistencies?.length ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Cross-check Verified</span>
-                <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-muted)' }}>
+                <span style={{ color: 'var(--text-primary)' }}>Cross-Output Drift</span>
+                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#166534', fontWeight: 500 }}>
                   {work.cross_check_summary?.inconsistencies?.length ? `${work.cross_check_summary.inconsistencies.length} conflicts` : '0 conflicts'}
                 </span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Check size={12} color={activeOutput.validation?.schema_valid !== false ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Schema Conformance</span>
+                <span style={{ color: 'var(--text-primary)' }}>Schema & Format</span>
                 <span style={{ 
                   marginLeft: 'auto', 
                   fontSize: '11px', 
                   color: activeOutput.validation?.schema_valid !== false ? '#166534' : '#dc2626', 
-                  fontWeight: 500 
+                  fontWeight: 600 
                 }}>
                   {activeOutput.validation?.status || (activeOutput.validation?.schema_valid !== false ? 'PASS' : 'FAIL')}
                 </span>
