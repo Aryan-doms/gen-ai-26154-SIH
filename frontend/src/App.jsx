@@ -53,6 +53,20 @@ export default function App() {
     return '2026-0417';
   });
   const [pendingPrompt, setPendingPrompt] = useState('');
+
+  // Ensure any cached dark mode classes/storage are cleanly purged
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark-theme');
+      try {
+        localStorage.removeItem('theme_mode');
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
   const [processingState, setProcessingState] = useState({
     isProcessing: false,
     isReady: false,

@@ -215,6 +215,21 @@ _Issued by Operations Command. For authorized inquiries, refer to docket 2026-04
                 "title": "Operation Silver Falcon",
                 "status": "Needs review",
                 "created_at": datetime.now(timezone.utc).isoformat(),
+                "config": {
+                    "audience": "Leadership",
+                    "tone": "Objective",
+                    "detail": "Standard",
+                    "objective": "Information Sharing",
+                    "classification": "Public Release",
+                    "languages": ["English"],
+                    "output_overrides": {
+                        "presentation": { "slide_count": 5 },
+                        "infographic": { "image_count": 1, "aspect_ratio": "1:1", "focus": "Executive Metrics" },
+                        "instagram_post": { "image_count": 1 },
+                        "twitter_post": { "account_type": "standard" },
+                        "whatsapp_message": { "purpose": "alert" }
+                    }
+                },
                 "source_package": [
                     {
                         "file_name": m.file_name,

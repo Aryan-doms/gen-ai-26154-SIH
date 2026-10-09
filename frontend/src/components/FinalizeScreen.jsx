@@ -14,9 +14,20 @@ import {
   Lock,
   Globe,
   CheckCircle2,
-  Send
+  Send,
+  Printer,
+  Presentation,
+  SlidersHorizontal,
+  Video
 } from 'lucide-react';
 import { fetchWorkDetails } from '../services/api';
+import { 
+  exportDocumentToDocx, 
+  exportDocumentToPdf, 
+  exportPresentationToPptx, 
+  exportScenesToSrt 
+} from '../utils/exportUtils';
+import { saveAs } from 'file-saver';
 
 export default function FinalizeScreen({ workId, onBack }) {
   const [work, setWork] = useState(null);
@@ -128,6 +139,64 @@ export default function FinalizeScreen({ workId, onBack }) {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+  };
+
+  const handleExportDocx = async (out) => {
+    let html = out.content || '';
+    if (!html.startsWith('<')) {
+      html = html.split('\n').map(l => `<p>${l}</p>`).join('');
+    }
+    await exportDocumentToDocx({
+      title: out.title,
+      contentHtml: html,
+      metadata: { workId: work.id, status: out.status }
+    });
+  };
+
+  const handleExportPdf = (out) => {
+    let html = out.content || '';
+    if (!html.startsWith('<')) {
+      html = html.split('\n').map(l => `<p>${l}</p>`).join('');
+    }
+    exportDocumentToPdf({
+      title: out.title,
+      contentHtml: html,
+      metadata: { workId: work.id, status: out.status }
+    });
+  };
+
+  const handleExportPptx = async (out) => {
+    let slides = [];
+    try {
+      const parsed = JSON.parse(out.content);
+      if (parsed.slides) slides = parsed.slides;
+    } catch (_) {}
+    if (!slides.length) {
+      slides = [
+        { slide_number: 1, layout: 'title', title: out.title, subtitle: 'Approved Presentation Deck' },
+        { slide_number: 2, layout: 'key_points', title: 'Key Findings', key_points: ['Approved findings and metrics'] }
+      ];
+    }
+    await exportPresentationToPptx({ deckTitle: out.title, slides });
+  };
+
+  const handleExportSrt = (out) => {
+    let scenes = [];
+    try {
+      const parsed = JSON.parse(out.content);
+      if (parsed.scenes) scenes = parsed.scenes;
+    } catch (_) {}
+    if (!scenes.length) {
+      scenes = [
+        { scene_number: 1, duration_seconds: 15, narration: 'Approved briefing narration script.' }
+      ];
+    }
+    exportScenesToSrt({ title: out.title, scenes });
+  };
+
+  const handleExportPng = (out) => {
+    const url = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80';
+    saveAs(url, `${(out.title || 'Infographic').replace(/\s+/g, '_')}.png`);
   };
 
   return (
@@ -350,7 +419,137 @@ export default function FinalizeScreen({ workId, onBack }) {
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {(out.type === 'executive_summary' || out.type === 'security_advisory') && (
+                      <>
+                        <button
+                          onClick={() => handleExportDocx(out)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            fontSize: '11px',
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 500
+                          }}
+                          title="Download Microsoft Word .docx"
+                        >
+                          <FileText size={11} color="#2563eb" /> DOCX
+                        </button>
+                        <button
+                          onClick={() => handleExportPdf(out)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            fontSize: '11px',
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 500
+                          }}
+                          title="Print or Save as PDF"
+                        >
+                          <Printer size={11} color="#dc2626" /> PDF
+                        </button>
+                      </>
+                    )}
+
+                    {out.type === 'presentation' && (
+                      <button
+                        onClick={() => handleExportPptx(out)}
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid var(--border)',
+                          backgroundColor: '#ffffff',
+                          fontSize: '11px',
+                          color: 'var(--text-primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 500
+                        }}
+                        title="Download Microsoft PowerPoint .pptx"
+                      >
+                        <Presentation size={11} color="#ea580c" /> Download PPTX
+                      </button>
+                    )}
+
+                    {out.type === 'video_script' && (
+                      <>
+                        <button
+                          onClick={() => handleExportSrt(out)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            fontSize: '11px',
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 500
+                          }}
+                          title="Download Subtitles .srt"
+                        >
+                          <Download size={11} color="#059669" /> Subtitles (.SRT)
+                        </button>
+                        <button
+                          onClick={() => handleExportDocx(out)}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            fontSize: '11px',
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 500
+                          }}
+                          title="Download Storyboard DOCX"
+                        >
+                          <FileText size={11} color="#2563eb" /> Storyboard DOCX
+                        </button>
+                      </>
+                    )}
+
+                    {out.type === 'infographic' && (
+                      <button
+                        onClick={() => handleExportPng(out)}
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid var(--border)',
+                          backgroundColor: '#ffffff',
+                          fontSize: '11px',
+                          color: 'var(--text-primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 500
+                        }}
+                        title="Download High-Resolution PNG"
+                      >
+                        <Download size={11} color="#2563eb" /> Download PNG
+                      </button>
+                    )}
+
                     <button
                       onClick={() => handleCopy(out.type, out.content)}
                       style={{
@@ -367,7 +566,7 @@ export default function FinalizeScreen({ workId, onBack }) {
                       }}
                     >
                       {copiedType === out.type ? <Check size={11} color="#166534" /> : <Copy size={11} />}
-                      {copiedType === out.type ? 'Copied' : 'Copy'}
+                      {copiedType === out.type ? 'Copied' : 'Copy Text'}
                     </button>
                   </div>
                 </div>

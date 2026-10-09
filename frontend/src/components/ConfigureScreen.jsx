@@ -40,7 +40,7 @@ function formatMiddleTruncate(fileName, maxLength = 19) {
 
 export default function ConfigureScreen({ initialPrompt, onStartTransformation, onCancel }) {
   // Global defaults
-  const [title, setTitle] = useState(initialPrompt || 'Operation Silver Falcon');
+  const [title, setTitle] = useState(initialPrompt || 'Project Documentation Transformation');
   const [audience, setAudience] = useState('Leadership');
   const [tone, setTone] = useState('Objective');
   const [detail, setDetail] = useState('Standard');
@@ -77,13 +77,30 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
 
   // Per-deliverable custom overrides state
   const [customOverrides, setCustomOverrides] = useState({
+    presentation: {
+      slide_count: 5
+    },
+    infographic: {
+      image_count: 1,
+      aspect_ratio: '1:1',
+      focus: ''
+    },
+    video_package: {
+      duration_seconds: 60
+    },
+    linkedin_post: {
+      image_count: 1
+    },
+    instagram_post: {
+      image_count: 1
+    },
     twitter_post: {
-      account_type: 'standard', // 'standard' (main + reply thread < 280) vs 'premium' (long-form)
+      account_type: 'standard',
       detail: 'Brief'
     },
     whatsapp_message: {
       detail: 'Brief',
-      objective: 'Actionable Guidance'
+      purpose: 'alert'
     }
   });
 
@@ -206,7 +223,23 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
   const handleResetToGlobal = (deliverableId) => {
     setCustomOverrides(prev => {
       const copy = { ...prev };
-      delete copy[deliverableId];
+      if (deliverableId === 'presentation') {
+        copy[deliverableId] = { slide_count: 5 };
+      } else if (deliverableId === 'infographic') {
+        copy[deliverableId] = { image_count: 1, aspect_ratio: '1:1', focus: '' };
+      } else if (deliverableId === 'video_package') {
+        copy[deliverableId] = { duration_seconds: 60 };
+      } else if (deliverableId === 'linkedin_post') {
+        copy[deliverableId] = { image_count: 1 };
+      } else if (deliverableId === 'instagram_post') {
+        copy[deliverableId] = { image_count: 1 };
+      } else if (deliverableId === 'twitter_post') {
+        copy[deliverableId] = { account_type: 'standard', detail: 'Brief' };
+      } else if (deliverableId === 'whatsapp_message') {
+        copy[deliverableId] = { detail: 'Brief', purpose: 'alert' };
+      } else {
+        delete copy[deliverableId];
+      }
       return copy;
     });
   };
@@ -288,7 +321,7 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Operation Silver Falcon, Incident 2026-0417, Quarterly Intelligence Brief..."
+            placeholder="e.g. National Policy Review, Annual Cybersecurity Audit, Disaster Relief Protocol..."
             style={{
               width: '100%',
               padding: '10px 14px',
@@ -488,7 +521,23 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
           }}>
             {availableOutputs.map(out => {
               const isSelected = !!selectedOutputs[out.id];
-              const isCustom = !!customOverrides[out.id];
+              const isCustom = (() => {
+                const o = customOverrides[out.id];
+                if (!o) return false;
+                if (out.id === 'presentation') {
+                  return (o.slide_count && o.slide_count !== 5) || !!o.audience || !!o.tone || !!o.detail || !!o.objective || !!o.additional_instructions;
+                }
+                if (out.id === 'infographic') {
+                  return (o.image_count && o.image_count !== 1) || (o.aspect_ratio && o.aspect_ratio !== '1:1') || !!o.focus || !!o.audience || !!o.tone || !!o.detail || !!o.objective || !!o.additional_instructions;
+                }
+                if (out.id === 'twitter_post') {
+                  return o.account_type === 'premium' || !!o.audience || !!o.tone || !!o.objective || !!o.additional_instructions;
+                }
+                if (out.id === 'whatsapp_message') {
+                  return !!o.purpose || !!o.audience || !!o.tone || !!o.additional_instructions;
+                }
+                return Object.keys(o).length > 0;
+              })();
               const isExpanded = expandedDeliverable === out.id;
 
               return (
@@ -582,16 +631,12 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
               boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    Custom Settings for {availableOutputs.find(o => o.id === expandedDeliverable)?.title}
-                  </span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                    (Overrides take precedence over Global Defaults)
-                  </span>
-                </div>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  Custom Settings for {availableOutputs.find(o => o.id === expandedDeliverable)?.title}
+                </span>
 
                 <button
+                  type="button"
                   onClick={() => handleResetToGlobal(expandedDeliverable)}
                   style={{
                     background: 'none',
@@ -607,11 +652,445 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
                 </button>
               </div>
 
-              {/* Specific Twitter / X Format Toggle */}
+              {/* Specific Presentation Slide Count Override */}
+              {expandedDeliverable === 'presentation' && (
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Number of Slides
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      1 to 8 slides • Default 5
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('presentation', 'slide_count', Math.max(1, (customOverrides.presentation?.slide_count || 5) - 1))}
+                      disabled={(customOverrides.presentation?.slide_count || 5) <= 1}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.presentation?.slide_count || 5) <= 1 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.presentation?.slide_count || 5) <= 1 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      -
+                    </button>
+                    <div style={{
+                      minWidth: '72px',
+                      textAlign: 'center',
+                      padding: '4px 8px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--border)',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {customOverrides.presentation?.slide_count || 5} {(customOverrides.presentation?.slide_count || 5) === 1 ? 'Slide' : 'Slides'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('presentation', 'slide_count', Math.min(8, (customOverrides.presentation?.slide_count || 5) + 1))}
+                      disabled={(customOverrides.presentation?.slide_count || 5) >= 8}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.presentation?.slide_count || 5) >= 8 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.presentation?.slide_count || 5) >= 8 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Specific Infographic Customization */}
+              {expandedDeliverable === 'infographic' && (
+                <div style={{ marginBottom: '14px', padding: '12px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    Infographic Customization
+                  </div>
+
+                  {/* Row 1: Image Count & Aspect Ratio */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center' }}>
+                    {/* Number of Images */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                          Number of Images
+                        </div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                          1 to 5 images • Default 1
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateOverride('infographic', 'image_count', Math.max(1, (customOverrides.infographic?.image_count || 1) - 1))}
+                          disabled={(customOverrides.infographic?.image_count || 1) <= 1}
+                          style={{
+                            width: '26px',
+                            height: '26px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: (customOverrides.infographic?.image_count || 1) <= 1 ? 'not-allowed' : 'pointer',
+                            opacity: (customOverrides.infographic?.image_count || 1) <= 1 ? 0.4 : 1,
+                            fontWeight: 600,
+                            fontSize: '13px',
+                            color: 'var(--text-primary)'
+                          }}
+                        >
+                          -
+                        </button>
+                        <div style={{
+                          minWidth: '64px',
+                          textAlign: 'center',
+                          padding: '3px 6px',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid var(--border)',
+                          borderRadius: '4px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          color: 'var(--text-primary)'
+                        }}>
+                          {customOverrides.infographic?.image_count || 1} {(customOverrides.infographic?.image_count || 1) === 1 ? 'Image' : 'Images'}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateOverride('infographic', 'image_count', Math.min(5, (customOverrides.infographic?.image_count || 1) + 1))}
+                          disabled={(customOverrides.infographic?.image_count || 1) >= 5}
+                          style={{
+                            width: '26px',
+                            height: '26px',
+                            borderRadius: '4px',
+                            border: '1px solid var(--border)',
+                            backgroundColor: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: (customOverrides.infographic?.image_count || 1) >= 5 ? 'not-allowed' : 'pointer',
+                            opacity: (customOverrides.infographic?.image_count || 1) >= 5 ? 0.4 : 1,
+                            fontWeight: 600,
+                            fontSize: '13px',
+                            color: 'var(--text-primary)'
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Canvas Ratio */}
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                          Canvas Ratio
+                        </span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                          Current: {customOverrides.infographic?.aspect_ratio || '1:1'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {['1:1', '16:9', '9:16', '4:3', '3:4'].map(ratio => {
+                          const isCurrent = (customOverrides.infographic?.aspect_ratio || '1:1') === ratio;
+                          return (
+                            <button
+                              key={ratio}
+                              type="button"
+                              onClick={() => handleUpdateOverride('infographic', 'aspect_ratio', ratio)}
+                              style={{
+                                padding: '3px 8px',
+                                borderRadius: '4px',
+                                border: isCurrent ? '1px solid var(--text-primary)' : '1px solid var(--border)',
+                                backgroundColor: isCurrent ? 'var(--text-primary)' : '#ffffff',
+                                color: isCurrent ? '#ffffff' : 'var(--text-primary)',
+                                fontSize: '11px',
+                                fontWeight: isCurrent ? 600 : 500,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {ratio}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Visual Focus */}
+                  <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        Visual Focus
+                      </label>
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Optional guidance</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. Executive Metrics, Attack Path, Timeline, System Topology..."
+                        value={customOverrides.infographic?.focus || ''}
+                        onChange={(e) => handleUpdateOverride('infographic', 'focus', e.target.value)}
+                        style={{
+                          flex: 1,
+                          padding: '5px 8px',
+                          fontSize: '11.5px',
+                          borderRadius: '4px',
+                          border: '1px solid var(--border)',
+                          backgroundColor: '#ffffff'
+                        }}
+                      />
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        {['Metrics', 'Flow', 'Timeline', 'Architecture'].map(preset => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => handleUpdateOverride('infographic', 'focus', preset)}
+                            style={{
+                              fontSize: '10.5px',
+                              padding: '3px 7px',
+                              borderRadius: '4px',
+                              border: '1px solid var(--border)',
+                              backgroundColor: customOverrides.infographic?.focus === preset ? 'var(--text-primary)' : '#ffffff',
+                              color: customOverrides.infographic?.focus === preset ? '#ffffff' : 'var(--text-secondary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Specific Video Package Duration Override */}
+              {expandedDeliverable === 'video_package' && (
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Video Duration
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      Estimated target duration • Default 60s
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                      { sec: 30, label: '30s' },
+                      { sec: 60, label: '60s (Default)' },
+                      { sec: 90, label: '90s' },
+                      { sec: 120, label: '120s' }
+                    ].map(opt => {
+                      const isCurrent = (customOverrides.video_package?.duration_seconds || 60) === opt.sec;
+                      return (
+                        <button
+                          key={opt.sec}
+                          type="button"
+                          onClick={() => handleUpdateOverride('video_package', 'duration_seconds', opt.sec)}
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '4px',
+                            border: isCurrent ? '1px solid var(--text-primary)' : '1px solid var(--border)',
+                            backgroundColor: isCurrent ? 'var(--text-primary)' : '#ffffff',
+                            color: isCurrent ? '#ffffff' : 'var(--text-primary)',
+                            fontSize: '11.5px',
+                            fontWeight: isCurrent ? 600 : 500,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Specific LinkedIn Post Image Count Override */}
+              {expandedDeliverable === 'linkedin_post' && (
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Number of Images
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      0 to 5 images • Default 1 (0 = Text Only)
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('linkedin_post', 'image_count', Math.max(0, (customOverrides.linkedin_post?.image_count ?? 1) - 1))}
+                      disabled={(customOverrides.linkedin_post?.image_count ?? 1) <= 0}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.linkedin_post?.image_count ?? 1) <= 0 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.linkedin_post?.image_count ?? 1) <= 0 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      -
+                    </button>
+                    <div style={{
+                      minWidth: '78px',
+                      textAlign: 'center',
+                      padding: '4px 8px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--border)',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {(customOverrides.linkedin_post?.image_count ?? 1) === 0
+                        ? 'Text Only'
+                        : `${customOverrides.linkedin_post?.image_count ?? 1} ${(customOverrides.linkedin_post?.image_count ?? 1) === 1 ? 'Image' : 'Images'}`}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('linkedin_post', 'image_count', Math.min(5, (customOverrides.linkedin_post?.image_count ?? 1) + 1))}
+                      disabled={(customOverrides.linkedin_post?.image_count ?? 1) >= 5}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.linkedin_post?.image_count ?? 1) >= 5 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.linkedin_post?.image_count ?? 1) >= 5 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Specific Instagram Post Image Count Override */}
+              {expandedDeliverable === 'instagram_post' && (
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Number of Images
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      1 to 5 images • Default 1
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('instagram_post', 'image_count', Math.max(1, (customOverrides.instagram_post?.image_count || 1) - 1))}
+                      disabled={(customOverrides.instagram_post?.image_count || 1) <= 1}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.instagram_post?.image_count || 1) <= 1 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.instagram_post?.image_count || 1) <= 1 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      -
+                    </button>
+                    <div style={{
+                      minWidth: '72px',
+                      textAlign: 'center',
+                      padding: '4px 8px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--border)',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {customOverrides.instagram_post?.image_count || 1} {(customOverrides.instagram_post?.image_count || 1) === 1 ? 'Image' : 'Images'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateOverride('instagram_post', 'image_count', Math.min(5, (customOverrides.instagram_post?.image_count || 1) + 1))}
+                      disabled={(customOverrides.instagram_post?.image_count || 1) >= 5}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        border: '1px solid var(--border)',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: (customOverrides.instagram_post?.image_count || 1) >= 5 ? 'not-allowed' : 'pointer',
+                        opacity: (customOverrides.instagram_post?.image_count || 1) >= 5 ? 0.4 : 1,
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Specific Twitter Format Toggle */}
               {expandedDeliverable === 'twitter_post' && (
-                <div style={{ marginBottom: '14px', padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px' }}>
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)' }}>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                    X (Twitter) Account Limit Format
+                    Post Format
                   </label>
                   <div style={{ display: 'flex', gap: '16px', fontSize: '12px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
@@ -630,7 +1109,7 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
                         checked={customOverrides.twitter_post?.account_type === 'premium'}
                         onChange={() => handleUpdateOverride('twitter_post', 'account_type', 'premium')}
                       />
-                      <span>X Premium (Long-form post / article format)</span>
+                      <span>X Premium (Long-form post format)</span>
                     </label>
                   </div>
                 </div>
@@ -638,9 +1117,9 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
 
               {/* Specific WhatsApp Message Format */}
               {expandedDeliverable === 'whatsapp_message' && (
-                <div style={{ marginBottom: '14px', padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px' }}>
+                <div style={{ marginBottom: '14px', padding: '10px 14px', backgroundColor: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border)' }}>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                    WhatsApp Broadcast Purpose
+                    Broadcast Type
                   </label>
                   <div style={{ display: 'flex', gap: '16px', fontSize: '12px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
@@ -650,7 +1129,7 @@ export default function ConfigureScreen({ initialPrompt, onStartTransformation, 
                         checked={customOverrides.whatsapp_message?.purpose !== 'community'}
                         onChange={() => handleUpdateOverride('whatsapp_message', 'purpose', 'alert')}
                       />
-                      <span>Community  Message</span>
+                      <span>Community Alert</span>
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                       <input 

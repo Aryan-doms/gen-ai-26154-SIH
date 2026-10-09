@@ -29,7 +29,7 @@
       "file_type": "text/plain",
       "file_hash_sha256": "cbe082cf9e4e24f971219c73f2a2aa33dc0d53c66fe9e44ffbdca836037eed8d",
       "file_size_bytes": 1033,
-      "summary_of_content": "Threat intelligence dossier covering observed IoCs and lack of confirmed adversary attribution."
+      "summary_of_content": "Threat intelligence report covering observed IoCs and lack of confirmed adversary attribution."
     },
     {
       "file_name": "04_affected_system.txt",

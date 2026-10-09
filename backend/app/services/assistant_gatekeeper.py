@@ -62,9 +62,9 @@ def handle_assistant_query(query: str, target_case_id: Optional[str] = None, cur
         prompt = (
             f"You are the SLM Domain Gatekeeper and Intelligence Assistant for an institutional cybersecurity transformation platform.\n\n"
             f"OPERATIONAL DOMAIN SCOPE:\n"
-            f"- Allowed: Cybersecurity incident analysis, digital forensics, threat actors, IoCs, operational status, case dossiers, canonical claims, deliverable approvals, and transformation workflows.\n"
+            f"- Allowed: Cybersecurity incident analysis, digital forensics, threat actors, IoCs, operational status, project documentation, canonical claims, deliverable approvals, and transformation workflows.\n"
             f"- Disallowed: Generic programming tasks, general knowledge trivia, sports, cooking, casual conversation, creative writing, or off-domain questions.\n\n"
-            f"CURRENT CASE DOSSIER ({target_id} - Operation Silver Falcon):\n"
+            f"CURRENT PROJECT CONTEXT ({target_id} - Operation Silver Falcon):\n"
             f"Claims:\n{claims_summary}\n\n"
             f"Deliverables Status:\n{outputs_summary}\n\n"
             f"OPERATOR QUERY:\n\"{clean_query}\"\n\n"

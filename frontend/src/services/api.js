@@ -154,6 +154,19 @@ export async function askAssistant(query, caseId = null) {
   });
 }
 
+export async function updateWorkParameters(workId, payload) {
+  try {
+    return await apiRequest(`/work/${workId}/parameters`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.warn("Failed to update parameters on backend, continuing locally:", err);
+    return { status: "local_only" };
+  }
+}
+
 // Deterministic responsive fallback fixture for demo reliability
 function getFallbackWorkItem(workId) {
   return {
@@ -161,6 +174,21 @@ function getFallbackWorkItem(workId) {
     title: "Operation Silver Falcon",
     status: "Needs review",
     created_at: new Date().toISOString(),
+    config: {
+      audience: "Leadership",
+      tone: "Objective",
+      detail: "Standard",
+      objective: "Information Sharing",
+      classification: "Public Release",
+      languages: ["English"],
+      output_overrides: {
+        presentation: { slide_count: 5 },
+        infographic: { image_count: 1, aspect_ratio: "1:1", focus: "Executive Metrics" },
+        instagram_post: { image_count: 1 },
+        twitter_post: { account_type: "standard" },
+        whatsapp_message: { purpose: "alert" }
+      }
+    },
     source_package: [
       { file_name: "01_incident_report.txt", file_type: "text/plain", file_hash_sha256: "e8f4702ba060a6a246ecdbfcf6e7bf7716f6b5536412f8646b9a8cf6ddbe38a1" },
       { file_name: "02_incident_timeline.txt", file_type: "text/plain", file_hash_sha256: "d5c6b7e8f90123456789abcdef0123456789abcdef0123456789abcdef012345" },

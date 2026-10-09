@@ -358,7 +358,7 @@ export default function HomeScreen({ onSelectWork, onStartNew }) {
                     color: '#1d4ed8',
                     border: '1px solid #bfdbfe'
                   }}>
-                    Grounded in Dossier
+                    Grounded in Source Documents
                   </span>
                 </div>
                 <button 

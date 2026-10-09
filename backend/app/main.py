@@ -79,6 +79,14 @@ class ApproveRequest(BaseModel):
     output_type: Optional[str] = None
     reviewer_name: str = "Lead Analyst"
 
+class UpdateParametersRequest(BaseModel):
+    output_type: Optional[str] = None
+    audience: Optional[str] = None
+    tone: Optional[str] = None
+    language: Optional[str] = None
+    detail: Optional[str] = None
+    overrides: Optional[Dict[str, Any]] = None
+
 # 1. GET /api/work - Home screen list
 @app.get("/api/work")
 def get_work_dashboard():
@@ -98,6 +106,21 @@ def get_transformation_work(work_id: str):
         "title": work["title"],
         "status": work["status"],
         "created_at": work["created_at"],
+        "config": work.get("config", {
+            "audience": "Leadership",
+            "tone": "Objective",
+            "detail": "Standard",
+            "language": "English",
+            "objective": "Information Sharing",
+            "classification": "Public Release",
+            "output_overrides": {
+                "presentation": { "slide_count": 5 },
+                "infographic": { "image_count": 1, "aspect_ratio": "1:1", "focus": "Executive Metrics" },
+                "instagram_post": { "image_count": 1 },
+                "twitter_post": { "account_type": "standard" },
+                "whatsapp_message": { "purpose": "alert" }
+            }
+        }),
         "source_package": work.get("source_package", []),
         "canonical_representation": work.get("canonical_representation", {}),
         "claims": work.get("claims", []),
@@ -312,6 +335,16 @@ Action Required: Verify local endpoint telemetry and follow standard verificatio
         "title": req.title,
         "status": "Needs review",
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "config": {
+            "audience": req.audience,
+            "tone": req.tone,
+            "detail": req.detail,
+            "objective": req.objective,
+            "classification": req.classification,
+            "languages": req.languages,
+            "additional_instructions": req.additional_instructions,
+            "output_overrides": req.output_overrides or {}
+        },
         "source_package": [
             {
                 "file_name": m.file_name,
@@ -435,6 +468,39 @@ def approve_output(work_id: str, req: ApproveRequest):
 
     store.save(work_id, work)
     return {"message": "Approval recorded", "work_status": work["status"], "outputs": work["outputs"]}
+
+# 6b. POST /api/work/{work_id}/parameters - Update target parameters and overrides
+@app.post("/api/work/{work_id}/parameters")
+def update_parameters(work_id: str, req: UpdateParametersRequest):
+    work = store.get(work_id)
+    if not work:
+        raise HTTPException(status_code=404, detail="Work item not found")
+
+    # Update active deliverable settings
+    if req.output_type:
+        for out in work.get("outputs", []):
+            if out.get("type") == req.output_type:
+                settings = out.setdefault("settings", {})
+                if req.audience: settings["audience"] = req.audience
+                if req.tone: settings["tone"] = req.tone
+                if req.language: settings["language"] = req.language
+                if req.detail: settings["detail"] = req.detail
+
+    # Update global config and output overrides
+    cfg = work.setdefault("config", {})
+    if req.audience: cfg["audience"] = req.audience
+    if req.tone: cfg["tone"] = req.tone
+    if req.language: cfg["language"] = req.language
+    if req.detail: cfg["detail"] = req.detail
+    if req.overrides:
+        cfg_overrides = cfg.setdefault("output_overrides", {})
+        if req.output_type:
+            cfg_overrides.setdefault(req.output_type, {}).update(req.overrides)
+        else:
+            cfg_overrides.update(req.overrides)
+
+    store.save(work_id, work)
+    return {"message": "Parameters updated", "config": cfg, "outputs": work.get("outputs", [])}
 
 # 7. POST /api/work/{work_id}/claims/{claim_id} - Stage 7 Fix Once: Update Canonical Claim & Selective Impact Analysis
 @app.post("/api/work/{work_id}/claims/{claim_id}", response_model=ImpactAnalysisResponse)

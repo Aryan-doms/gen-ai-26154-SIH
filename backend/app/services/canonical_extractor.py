@@ -46,11 +46,11 @@ def extract_canonical_source(source_dir: str = "dummy_data", case_id: str = "INC
         files = sorted([os.path.join(source_dir, f) for f in os.listdir(source_dir) if not f.startswith(".")])
 
     if not files:
-        # Graceful fallback: Built-in verified reference dossier metadata
+        # Graceful fallback: Built-in verified reference project metadata
         fallback_files = [
             ("01_incident_report.pdf", 2412, "Primary SOC incident report detailing overview, affected systems, impact, and attribution status."),
             ("02_incident_timeline.pdf", 1438, "Chronological event log recording detection, compromise, and containment timestamps in UTC."),
-            ("03_threat_intel.png", 1024, "Threat intelligence dossier covering observed IoCs and lack of confirmed adversary attribution."),
+            ("03_threat_intel.png", 1024, "Threat intelligence report covering observed IoCs and lack of confirmed adversary attribution."),
             ("04_affected_system.png", 1126, "Technical infrastructure map for PORTAL-01, APP-02, and AUTH-01 including remediation steps."),
             ("05_incident_context.txt", 967, "Strategic operational background highlighting impacted academic/government research community."),
             ("06_reference_advisory.pdf", 1024, "Reference advisory guidelines and defensive mitigation protocols.")
@@ -81,7 +81,7 @@ def extract_canonical_source(source_dir: str = "dummy_data", case_id: str = "INC
         elif "02_incident_timeline" in fname:
             summary = "Chronological event log recording detection, compromise, and containment timestamps in UTC."
         elif "03_threat_intel" in fname:
-            summary = "Threat intelligence dossier covering observed IoCs and lack of confirmed adversary attribution."
+            summary = "Threat intelligence report covering observed IoCs and lack of confirmed adversary attribution."
         elif "04_affected_system" in fname:
             summary = "Technical infrastructure map for PORTAL-01, APP-02, and AUTH-01 including remediation steps."
         elif "05_incident_context" in fname:

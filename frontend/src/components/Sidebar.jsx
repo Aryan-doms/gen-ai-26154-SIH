@@ -13,7 +13,7 @@ export default function Sidebar({ currentScreen, onNavigate }) {
     <aside style={{
       width: '54px',
       height: '100vh',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--bg-card)',
       borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
@@ -22,7 +22,8 @@ export default function Sidebar({ currentScreen, onNavigate }) {
       position: 'fixed',
       left: 0,
       top: 0,
-      zIndex: 50
+      zIndex: 50,
+      transition: 'background-color 0.15s ease, border-color 0.15s ease'
     }}>
       {/* Brand logo icon */}
       <div 
@@ -32,7 +33,7 @@ export default function Sidebar({ currentScreen, onNavigate }) {
           height: '30px',
           borderRadius: '6px',
           backgroundColor: 'var(--btn-primary-bg)',
-          color: '#ffffff',
+          color: 'var(--btn-primary-text)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -42,9 +43,9 @@ export default function Sidebar({ currentScreen, onNavigate }) {
           marginBottom: '20px',
           letterSpacing: '-0.02em'
         }}
-        title="IntelForge"
+        title="Content Transformation Platform"
       >
-        IF
+        CT
       </div>
 
       {/* Nav icons */}
@@ -76,8 +77,9 @@ export default function Sidebar({ currentScreen, onNavigate }) {
         })}
       </div>
 
-      {/* Settings & Avatar */}
+      {/* Settings & User Avatar */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+
         <button 
           style={{
             width: '36px',
