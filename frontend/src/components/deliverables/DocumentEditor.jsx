@@ -85,6 +85,7 @@ export default function DocumentEditor({
   claims = [],
   config = {},
   onSave,
+  onChange,
   onClaimClick,
   selectedClaimId,
   isEditing,
@@ -101,6 +102,11 @@ export default function DocumentEditor({
     extensions: documentExtensions,
     content: markdownToHtml(initialContent),
     editable: isEditing,
+    onUpdate: ({ editor: ed }) => {
+      if (onChange) {
+        onChange(ed.getText());
+      }
+    },
     editorProps: {
       attributes: {
         class: 'tiptap-editorial-canvas',
@@ -453,38 +459,39 @@ export default function DocumentEditor({
           transition: 'background-color 0.15s ease'
         }}
       >
-        {isEditing ? (
-          editor && !editor.isDestroyed && editor.schema ? (
-            <EditorContent editor={editor} />
+        <div style={{ flex: 1 }}>
+          {isEditing ? (
+            editor && !editor.isDestroyed && editor.schema ? (
+              <EditorContent editor={editor} />
+            ) : (
+              <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Initializing rich-text editor...</div>
+            )
           ) : (
-            <div style={{ padding: '24px', color: 'var(--text-muted)' }}>Initializing rich-text editor...</div>
-          )
-        ) : (
-          <div style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-primary)' }}>
-            {renderReadingView(initialContent)}
-          </div>
-        )}
-      </div>
+            <div style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'var(--text-primary)' }}>
+              {renderReadingView(initialContent)}
+            </div>
+          )}
+        </div>
 
-      {/* Document Audit Footer (Permanently docked & visible) */}
-      <div style={{
-        padding: '10px 24px',
-        backgroundColor: 'var(--bg-subtle)',
-        borderTop: '1px solid var(--border)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'nowrap',
-        gap: '12px',
-        fontSize: '11px',
-        color: 'var(--text-muted)',
-        flexShrink: 0
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Document ID:</span><strong style={{ color: 'var(--text-secondary)' }}>DOC-{workId}</strong></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Version:</span><strong style={{ color: 'var(--text-secondary)' }}>v{versionNumber}.0 ({status})</strong></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Created:</span><strong style={{ color: 'var(--text-secondary)' }}>{createdAt.toLocaleString()}</strong></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Last edited:</span><strong style={{ color: 'var(--text-secondary)' }}>{lastEditedAt.toLocaleString()}</strong></div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Operator:</span><strong style={{ color: 'var(--text-secondary)' }}>Lead Operator</strong></div>
+        {/* Document Audit Footer (Only visible at the very end of document) */}
+        <div style={{
+          marginTop: '40px',
+          paddingTop: '16px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          fontSize: '11px',
+          color: 'var(--text-muted)'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Document ID:</span><strong style={{ color: 'var(--text-secondary)' }}>DOC-{workId}</strong></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Version:</span><strong style={{ color: 'var(--text-secondary)' }}>v{versionNumber}.0 ({status})</strong></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Created:</span><strong style={{ color: 'var(--text-secondary)' }}>{createdAt.toLocaleString()}</strong></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Last edited:</span><strong style={{ color: 'var(--text-secondary)' }}>{lastEditedAt.toLocaleString()}</strong></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}><span>Operator:</span><strong style={{ color: 'var(--text-secondary)' }}>Lead Operator</strong></div>
+        </div>
       </div>
 
     </div>
