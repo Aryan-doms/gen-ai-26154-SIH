@@ -141,8 +141,9 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
   // Infographic active image state: null (gallery) or graphic object { id, title, aspect_ratio, url }
   const [openGraphic, setOpenGraphic] = useState(null);
 
-  // Target Parameters editing state
+  // Target Parameters editing and collapse state
   const [isEditingParams, setIsEditingParams] = useState(false);
+  const [isParamsCollapsed, setIsParamsCollapsed] = useState(true);
   const [paramState, setParamState] = useState({
     audience: 'Leadership',
     tone: 'Objective',
@@ -968,12 +969,12 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
         
         {/* LEFT COLUMN: Sources & Context-Grounded Claims Rail */}
         {/* LEFT COLUMN: Sources & Context-Grounded Claims Rail with Independent Scrolling */}
-        <aside style={{ backgroundColor: '#ffffff', borderRight: '1px solid var(--border)', overflow: 'hidden', minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <aside style={{ backgroundColor: '#fafaf9', borderRight: '1px solid #f1f5f9', overflow: 'hidden', minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
           
-          {/* Sources Section: Balanced Split Height (320px) with Independent Scroll */}
-          <div style={{ flexShrink: 0, height: '320px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '14px 16px 8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+          {/* Sources Section: Compact List with Independent Scroll */}
+          <div style={{ flexShrink: 0, maxHeight: '200px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '12px 16px 6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Sources ({work.source_package?.length || 0})
               </div>
               <button
@@ -1012,12 +1013,9 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
               </button>
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 10px 6px 10px', display: 'flex', flexDirection: 'column', gap: '1px' }}>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 10px 4px 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {work.source_package?.map((file, i) => {
                 const isGrounded = activeSourceFile && file.file_name === activeSourceFile;
-                const sizeText = file.file_size_bytes 
-                  ? `${(file.file_size_bytes / 1024).toFixed(1)} KB` 
-                  : 'Verified';
                 return (
                   <div 
                     key={i} 
@@ -1029,7 +1027,7 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                       fontSize: '11px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
+                      gap: '7px',
                       cursor: 'default',
                       transition: 'all 0.15s ease'
                     }}
@@ -1039,17 +1037,13 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                     onMouseLeave={e => {
                       if (!isGrounded) e.currentTarget.style.backgroundColor = 'transparent';
                     }}
+                    title={isGrounded ? `${file.file_name} (Active Claim Source)` : file.file_name}
                   >
                     <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                       {getSourceIcon(file.file_name)}
                     </div>
-                    <div style={{ overflow: 'hidden', flex: 1 }}>
-                      <div style={{ fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {file.file_name}
-                      </div>
-                      <div style={{ fontSize: '10px', color: isGrounded ? '#1e40af' : 'var(--text-muted)' }}>
-                        {isGrounded ? '✓ Active Claim Source' : `${sizeText} · ${getSourceTypeLabel(file.file_name)}`}
-                      </div>
+                    <div style={{ fontWeight: 500, color: isGrounded ? '#1e40af' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                      {file.file_name}
                     </div>
                   </div>
                 );
@@ -1057,39 +1051,36 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
             </div>
           </div>
 
-          {/* Symmetric Divider Line with Equal Margins */}
-          <div style={{ borderBottom: '1px solid var(--border)', margin: '10px 16px', flexShrink: 0 }} />
+          {/* Symmetric Divider Line with Soft Border */}
+          <div style={{ borderBottom: '1px solid #f1f5f9', margin: '8px 16px', flexShrink: 0 }} />
 
           {/* Context-First Claims & Evidence Cards: Takes Remainder of Height with Independent Scroll */}
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '2px 16px 8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Project Facts & Claims ({work.claims?.length || 0})
                 </div>
-                {/* Two Clickable Filter Buttons: Verified & Needs Review */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                {/* Two Clickable Filter Buttons: Verified & Needs Review (No colored dots, matching theme) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
                   <button
                     type="button"
                     onClick={() => setClaimsFilter(prev => prev === 'verified' ? null : 'verified')}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px',
-                      backgroundColor: claimsFilter === 'verified' ? '#f0fdf4' : '#f8fafc',
-                      border: claimsFilter === 'verified' ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                      backgroundColor: claimsFilter === 'verified' ? '#f0fdf4' : '#ffffff',
+                      border: claimsFilter === 'verified' ? '1px solid #16a34a' : '1px solid var(--border)',
                       borderRadius: '4px',
                       padding: '2px 7px',
                       fontSize: '10px',
-                      fontWeight: 600,
-                      color: claimsFilter === 'verified' ? '#15803d' : '#64748b',
+                      fontWeight: 500,
+                      color: claimsFilter === 'verified' ? '#15803d' : 'var(--text-secondary)',
                       cursor: 'pointer',
-                      boxShadow: claimsFilter === 'verified' ? '0 0 0 2px rgba(22, 163, 74, 0.2)' : 'none',
                       transition: 'all 0.15s ease'
                     }}
-                    title="Click to filter by verified facts"
+                    title="Filter by verified facts"
                   >
-                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: claimsFilter === 'verified' ? '#16a34a' : '#94a3b8' }} />
                     <span>Verified ({work.claims?.filter(c => (c.verification_status || 'verified').toLowerCase().includes('verified')).length || work.claims?.length || 0})</span>
                   </button>
 
@@ -1099,28 +1090,25 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px',
-                      backgroundColor: claimsFilter === 'needs_review' ? '#fef2f2' : '#f8fafc',
-                      border: claimsFilter === 'needs_review' ? '1.5px solid #dc2626' : '1px solid #e2e8f0',
+                      backgroundColor: claimsFilter === 'needs_review' ? '#fef3c7' : '#ffffff',
+                      border: claimsFilter === 'needs_review' ? '1px solid #f59e0b' : '1px solid var(--border)',
                       borderRadius: '4px',
                       padding: '2px 7px',
                       fontSize: '10px',
-                      fontWeight: 600,
-                      color: claimsFilter === 'needs_review' ? '#b91c1c' : '#64748b',
+                      fontWeight: 500,
+                      color: claimsFilter === 'needs_review' ? '#92400e' : 'var(--text-secondary)',
                       cursor: 'pointer',
-                      boxShadow: claimsFilter === 'needs_review' ? '0 0 0 2px rgba(220, 38, 38, 0.2)' : 'none',
                       transition: 'all 0.15s ease'
                     }}
-                    title="Click to filter by claims needing review"
+                    title="Filter by claims needing review"
                   >
-                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: claimsFilter === 'needs_review' ? '#ef4444' : '#94a3b8' }} />
                     <span>Needs Review ({work.claims?.filter(c => !(c.verification_status || 'verified').toLowerCase().includes('verified')).length || 0})</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 14px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 12px 14px 12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {(work.claims || [])
                 .filter(claim => {
                   if (!claimsFilter) return true;
@@ -1132,6 +1120,8 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                 .map(claim => {
                 const isSelected = selectedClaimId === claim.claim_id;
                 const isClaim1 = claim.claim_id === 'CLM-001';
+                const isUpdated = isClaim1 && (claim.claim_text || '').includes('52');
+                const isVerified = (claim.verification_status || 'verified').toLowerCase().includes('verified');
                 const contextTitle = CLAIM_CONTEXT_MAP[claim.claim_id] || 'Verified Factual Claim';
                 const primaryEvidence = claim.evidence?.[0];
 
@@ -1140,134 +1130,195 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                     key={claim.claim_id}
                     onClick={() => handleSelectClaim(claim.claim_id)}
                     style={{
-                      padding: '8px 10px',
                       borderRadius: '6px',
-                      border: isSelected ? '1.5px solid #3b82f6' : '1px solid var(--border)',
-                      backgroundColor: isSelected ? '#eff6ff' : (isClaim1 && (claim.claim_text || '').includes('52') ? '#f0fdf4' : 'var(--bg-card)'),
+                      border: !isVerified ? '1px solid #fde68a' : (isSelected ? '1.5px solid #3b82f6' : '1px solid var(--border)'),
+                      backgroundColor: isSelected ? '#eff6ff' : (!isVerified ? '#fffbeb' : (isUpdated ? '#f0fdf4' : '#ffffff')),
                       cursor: 'pointer',
-                      fontSize: '11px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px',
-                      transition: 'all 0.15s ease'
+                      transition: 'all 0.15s ease',
+                      overflow: 'hidden'
                     }}
+                    onMouseEnter={e => {
+                      if (!isSelected && isVerified) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                    }}
+                    onMouseLeave={e => {
+                      if (!isSelected && isVerified) e.currentTarget.style.backgroundColor = isUpdated ? '#f0fdf4' : '#ffffff';
+                    }}
+                    title={!isSelected ? `[${claim.claim_id}] ${claim.claim_text}\nSource: ${primaryEvidence?.source_file || 'Document'}` : undefined}
                   >
-                    {/* 1. Context & Identifier Header */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '3px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <span style={{ fontWeight: 700, fontFamily: 'monospace', color: 'var(--text-primary)' }}>{claim.claim_id}</span>
-                        <span style={{ color: 'var(--border)' }}>·</span>
-                        <span style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '10px' }}>{contextTitle}</span>
+                    {/* Compact 1-Line Header (Always Visible) */}
+                    <div style={{ 
+                      padding: '7px 9px',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      gap: '6px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden', flex: 1 }}>
+                        <span style={{ 
+                          fontWeight: 700, 
+                          fontFamily: 'monospace', 
+                          fontSize: '10.5px',
+                          color: isSelected ? '#1d4ed8' : 'var(--text-primary)',
+                          backgroundColor: isSelected ? '#dbeafe' : 'var(--bg-subtle)',
+                          padding: '1px 5px',
+                          borderRadius: '3px',
+                          flexShrink: 0
+                        }}>
+                          {claim.claim_id}
+                        </span>
+                        <span style={{ 
+                          fontWeight: 500, 
+                          color: isSelected ? '#1e3a8a' : 'var(--text-primary)', 
+                          fontSize: '11px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {contextTitle}
+                        </span>
                       </div>
-                      <span style={{ 
-                        fontSize: '9px', 
-                        fontWeight: 600,
-                        color: isClaim1 && (claim.claim_text || '').includes('52') ? '#166534' : 'var(--text-muted)',
-                        backgroundColor: isClaim1 && (claim.claim_text || '').includes('52') ? '#dcfce7' : 'var(--bg-subtle)',
-                        padding: '1px 4px',
-                        borderRadius: '3px'
-                      }}>
-                        {isClaim1 && (claim.claim_text || '').includes('52') ? 'v2 Updated' : claim.confidence}
-                      </span>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+                        {isUpdated ? (
+                          <span style={{ 
+                            fontSize: '9px', 
+                            fontWeight: 600, 
+                            color: '#166534', 
+                            backgroundColor: '#dcfce7', 
+                            padding: '1px 4px', 
+                            borderRadius: '3px' 
+                          }}>
+                            v2
+                          </span>
+                        ) : !isVerified ? (
+                          <span style={{ 
+                            fontSize: '9px', 
+                            fontWeight: 600, 
+                            color: '#92400e', 
+                            backgroundColor: '#fef3c7', 
+                            padding: '1px 4px', 
+                            borderRadius: '3px' 
+                          }}>
+                            Review
+                          </span>
+                        ) : null}
+
+                        <ChevronDown 
+                          size={12} 
+                          color="var(--text-muted)" 
+                          style={{ 
+                            transform: isSelected ? 'rotate(180deg)' : 'rotate(0deg)', 
+                            transition: 'transform 0.15s ease' 
+                          }} 
+                        />
+                      </div>
                     </div>
 
-                    {/* 2. Atomic Verified Statement */}
-                    <div style={{ color: 'var(--text-primary)', lineHeight: 1.4, margin: '2px 0' }}>
-                      {claim.claim_text}
-                    </div>
-
-                    {/* 3. Source File Origin Badge (Strict requirement) */}
-                    {primaryEvidence && (
-                      <div style={{ 
-                        marginTop: '2px', 
-                        padding: '3px 6px', 
-                        borderRadius: '4px', 
-                        backgroundColor: 'var(--bg-subtle)', 
-                        border: '1px solid var(--border)',
-                        fontSize: '10px',
-                        color: 'var(--text-secondary)'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500, color: 'var(--text-primary)' }}>
-                          <FileText size={10} />
-                          <span>{primaryEvidence.source_file}</span>
-                          {primaryEvidence.location && <span style={{ color: 'var(--text-muted)' }}>({primaryEvidence.location})</span>}
-                        </div>
-                        {primaryEvidence.supporting_text_or_description && (
-                          <div style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '9px', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            "{primaryEvidence.supporting_text_or_description}"
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* 4. Functional Fact Correction Action */}
+                    {/* Expanded Content (Visible Only When Clicked / Selected) */}
                     {isSelected && (
-                      <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--border)' }}>
-                        {editingClaimId === claim.claim_id ? (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                              Update Verified Ground Truth Statement:
+                      <div 
+                        style={{ 
+                          padding: '0 9px 8px 9px',
+                          borderTop: '1px solid rgba(59, 130, 246, 0.15)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                          fontSize: '11px'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        {/* 1. Atomic Statement */}
+                        <div style={{ color: 'var(--text-primary)', lineHeight: 1.4, marginTop: '6px', fontSize: '11px' }}>
+                          {claim.claim_text}
+                        </div>
+
+                        {/* 2. Source File Origin Badge */}
+                        {primaryEvidence && (
+                          <div style={{ 
+                            padding: '4px 7px', 
+                            borderRadius: '4px', 
+                            backgroundColor: '#ffffff', 
+                            border: '1px solid var(--border)',
+                            fontSize: '10px',
+                            color: 'var(--text-secondary)'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500, color: 'var(--text-primary)' }}>
+                              <FileText size={10} />
+                              <span>{primaryEvidence.source_file}</span>
+                              {primaryEvidence.location && <span style={{ color: 'var(--text-muted)' }}>({primaryEvidence.location})</span>}
                             </div>
-                            <textarea
-                              value={editedClaimText}
-                              onChange={(e) => setEditedClaimText(e.target.value)}
-                              rows={2}
-                              style={{ width: '100%', fontSize: '11px', padding: '4px 6px', border: '1px solid var(--border)', borderRadius: '4px', resize: 'none', outline: 'none' }}
-                            />
-                            <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', marginTop: '2px' }}>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setEditingClaimId(null); }}
-                                style={{ padding: '3px 6px', fontSize: '10px', background: 'none', border: '1px solid var(--border)', borderRadius: '3px', cursor: 'pointer' }}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleApplyClaimCorrection(claim.claim_id, editedClaimText);
-                                }}
-                                disabled={updatingClaim}
-                                style={{ padding: '3px 8px', fontSize: '10px', backgroundColor: 'var(--text-primary)', color: '#ffffff', border: 'none', borderRadius: '3px', fontWeight: 500, cursor: 'pointer' }}
-                              >
-                                {updatingClaim ? 'Propagating...' : 'Propagate Update →'}
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                              {activeOutput.claim_dependencies?.includes(claim.claim_id) ? 'Cited in active deliverable' : 'Canonical evidence'}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingClaimId(claim.claim_id);
-                                const is52 = (claim.claim_text || '').includes('52');
-                                setEditedClaimText(
-                                  claim.claim_id === 'CLM-001' && !is52
-                                    ? "The incident resulted in approximately 52 minutes of service disruption before containment protocols were completed at 03:22 UTC."
-                                    : claim.claim_id === 'CLM-001' && is52
-                                    ? "Research portal experienced approximately 47 minutes of operational disruption."
-                                    : (claim.claim_text || '')
-                                );
-                              }}
-                              style={{
-                                padding: '2px 6px',
-                                fontSize: '10px',
-                                backgroundColor: '#ffffff',
-                                border: '1px solid var(--border)',
-                                borderRadius: '3px',
-                                color: 'var(--text-secondary)',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '3px'
-                              }}
-                            >
-                              <Edit2 size={10} /> Correct Fact
-                            </button>
+                            {primaryEvidence.supporting_text_or_description && (
+                              <div style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '9.5px', marginTop: '2px', lineHeight: 1.35 }}>
+                                "{primaryEvidence.supporting_text_or_description}"
+                              </div>
+                            )}
                           </div>
                         )}
+
+                        {/* 3. Action */}
+                        <div style={{ paddingTop: '4px', borderTop: '1px dashed var(--border)' }}>
+                          {editingClaimId === claim.claim_id ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                                Update Verified Ground Truth Statement:
+                              </div>
+                              <textarea
+                                value={editedClaimText}
+                                onChange={(e) => setEditedClaimText(e.target.value)}
+                                rows={2}
+                                style={{ width: '100%', fontSize: '11px', padding: '4px 6px', border: '1px solid var(--border)', borderRadius: '4px', resize: 'none', outline: 'none' }}
+                              />
+                              <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', marginTop: '2px' }}>
+                                <button
+                                  onClick={() => setEditingClaimId(null)}
+                                  style={{ padding: '3px 6px', fontSize: '10px', background: 'none', border: '1px solid var(--border)', borderRadius: '3px', cursor: 'pointer' }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={() => handleApplyClaimCorrection(claim.claim_id, editedClaimText)}
+                                  disabled={updatingClaim}
+                                  style={{ padding: '3px 8px', fontSize: '10px', backgroundColor: 'var(--text-primary)', color: '#ffffff', border: 'none', borderRadius: '3px', fontWeight: 500, cursor: 'pointer' }}
+                                >
+                                  {updatingClaim ? 'Propagating...' : 'Propagate Update →'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '9.5px', color: 'var(--text-muted)' }}>
+                                {activeOutput.claim_dependencies?.includes(claim.claim_id) ? 'Cited in active deliverable' : 'Canonical evidence'}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  setEditingClaimId(claim.claim_id);
+                                  const is52 = (claim.claim_text || '').includes('52');
+                                  setEditedClaimText(
+                                    claim.claim_id === 'CLM-001' && !is52
+                                      ? "The incident resulted in approximately 52 minutes of service disruption before containment protocols were completed at 03:22 UTC."
+                                      : claim.claim_id === 'CLM-001' && is52
+                                      ? "Research portal experienced approximately 47 minutes of operational disruption."
+                                      : (claim.claim_text || '')
+                                  );
+                                }}
+                                style={{
+                                  padding: '2px 6px',
+                                  fontSize: '10px',
+                                  backgroundColor: '#ffffff',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: '3px',
+                                  color: 'var(--text-secondary)',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '3px'
+                                }}
+                              >
+                                <Edit2 size={10} /> Correct Fact
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1932,7 +1983,7 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
         </main>
 
         {/* RIGHT COLUMN: Output Settings & Validation Rail */}
-        <aside style={{ backgroundColor: '#ffffff', borderLeft: '1px solid var(--border)', overflowY: 'auto', minHeight: 0, height: '100%', padding: '16px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <aside style={{ backgroundColor: '#fafaf9', borderLeft: '1px solid #f1f5f9', overflowY: 'auto', minHeight: 0, height: '100%', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Header */}
           <div>
@@ -1944,25 +1995,41 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
             </div>
           </div>
 
-          <div style={{ borderBottom: '1px solid var(--border)' }} />
+          <div style={{ borderBottom: '1px solid #f1f5f9' }} />
 
-          {/* TARGET PARAMETERS (Carried over from configuration with inline Edit mode) */}
+          {/* TARGET PARAMETERS (Collapsible Accordion Menu) */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Target Parameters
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isParamsCollapsed ? '0px' : '8px' }}>
+              <div 
+                onClick={() => setIsParamsCollapsed(!isParamsCollapsed)}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', userSelect: 'none' }}
+              >
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Target Parameters
+                </div>
+                <ChevronDown 
+                  size={12} 
+                  color="var(--text-muted)" 
+                  style={{ 
+                    transform: isParamsCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)', 
+                    transition: 'transform 0.15s ease' 
+                  }} 
+                />
               </div>
               <button
                 type="button"
-                onClick={() => setIsEditingParams(!isEditingParams)}
+                onClick={() => {
+                  if (isParamsCollapsed) setIsParamsCollapsed(false);
+                  setIsEditingParams(!isEditingParams);
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  padding: '3px 8px',
-                  fontSize: '11px',
-                  color: isEditingParams ? '#dc2626' : 'var(--text-primary)',
-                  backgroundColor: 'var(--bg-card)',
+                  padding: '2px 7px',
+                  fontSize: '10.5px',
+                  color: isEditingParams ? '#92400e' : 'var(--text-secondary)',
+                  backgroundColor: 'transparent',
                   border: '1px solid var(--border)',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -1970,12 +2037,15 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                   transition: 'background-color 0.15s ease'
                 }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <Edit2 size={11} />
+                <Edit2 size={10} />
                 <span>{isEditingParams ? 'Cancel' : 'Edit'}</span>
               </button>
             </div>
+
+            {!isParamsCollapsed && (
+              <div style={{ marginTop: '8px' }}>
 
             {paramsSavedNotice && (
               <div style={{
@@ -2465,88 +2535,29 @@ export default function WorkspaceScreen({ workId, onBack, onFinalize }) {
                 </div>
               </div>
             )}
+              </div>
+            )}
           </div>
 
-          <div style={{ borderBottom: '1px solid var(--border)' }} />
+          <div style={{ borderBottom: '1px solid #f1f5f9' }} />
 
-          {/* Verification Checklist */}
-          <div>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
-              Deliverable Verification
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Check size={12} color={activeOutput.validation?.source_grounded !== false ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Claims Cited</span>
-                <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  {activeOutput.claim_dependencies?.length || 0} of {work.claims?.length || 0}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Check size={12} color={!work.cross_check_summary?.inconsistencies?.length ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Cross-Output Drift</span>
-                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#166534', fontWeight: 500 }}>
-                  {work.cross_check_summary?.inconsistencies?.length ? `${work.cross_check_summary.inconsistencies.length} conflicts` : '0 conflicts'}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Check size={12} color={activeOutput.validation?.schema_valid !== false ? "#166534" : "#dc2626"} />
-                <span style={{ color: 'var(--text-primary)' }}>Schema & Format</span>
-                <span style={{ 
-                  marginLeft: 'auto', 
-                  fontSize: '11px', 
-                  color: activeOutput.validation?.schema_valid !== false ? '#166534' : '#dc2626', 
-                  fontWeight: 600 
-                }}>
-                  {activeOutput.validation?.status || (activeOutput.validation?.schema_valid !== false ? 'PASS' : 'FAIL')}
-                </span>
-              </div>
-            </div>
-
-            {/* Interactive Claim Traceability Chips */}
-            <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed var(--border)' }}>
-              <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
-                Trace Cited Claims
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {(activeOutput.claim_dependencies?.length ? activeOutput.claim_dependencies : ['CLM-001', 'CLM-002', 'CLM-003', 'CLM-004', 'CLM-005']).map(cid => {
-                  const isSel = selectedClaimId === cid;
-                  return (
-                    <button
-                      key={cid}
-                      type="button"
-                      onClick={() => handleSelectClaim(cid)}
-                      style={{
-                        padding: '3px 7px',
-                        borderRadius: '4px',
-                        border: isSel ? '1.5px solid #3b82f6' : '1px solid var(--border)',
-                        backgroundColor: isSel ? '#1e3a8a' : 'var(--bg-card)',
-                        color: isSel ? '#ffffff' : 'var(--text-primary)',
-                        fontSize: '10.5px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseEnter={e => { if (!isSel) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'; }}
-                      onMouseLeave={e => { if (!isSel) e.currentTarget.style.backgroundColor = 'var(--bg-card)'; }}
-                      title={`Click to jump to and highlight ${cid} in document`}
-                    >
-                      <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: isSel ? '#93c5fd' : '#16a34a' }} />
-                      <span>{cid}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+          {/* Cross-Output Drift */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11.5px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Cross-Output Drift
+            </span>
+            <span style={{
+              fontSize: '11px',
+              color: work.cross_check_summary?.inconsistencies?.length ? '#92400e' : '#166534',
+              fontWeight: 500
+            }}>
+              {work.cross_check_summary?.inconsistencies?.length
+                ? `${work.cross_check_summary.inconsistencies.length} conflicts`
+                : '0 conflicts'}
+            </span>
           </div>
 
-          <div style={{ borderBottom: '1px solid var(--border)' }} />
+          <div style={{ borderBottom: '1px solid #f1f5f9' }} />
 
           {/* Approval Controls */}
           <div>
